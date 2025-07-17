@@ -7,7 +7,7 @@ from typing import Any, Dict, List
 
 import numpy as np
 from mojort.platforms import get_mojort_docker_platform_from
-from mojort.runners import get_mojort_runner
+from mojort.runners import get_mojort_runner, get_mojort_builder
 
 from benchkit.benchmark import Benchmark, RecordResult
 from benchkit.campaign import CampaignCartesianProduct
@@ -113,6 +113,7 @@ class LatencyBench(Benchmark):
 
 
 def main() -> None:
+    get_mojort_builder().build()
     runner = get_mojort_runner()
     platform = get_mojort_docker_platform_from(runner=runner)
     campaign = CampaignCartesianProduct(
