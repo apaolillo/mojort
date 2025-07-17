@@ -1,0 +1,6 @@
+[submodule "deps/benchkit"]
+	path = deps/benchkit
+	url = git@github.com:open-s4c/benchkit.git
+[submodule "deps/pythainer"]
+	path = deps/pythainer
+	url = git@github.com:apaolillo/pythainer.git

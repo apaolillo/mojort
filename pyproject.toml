@@ -1,0 +1,34 @@
+[project]
+name = "mojort"
+version = "0.0.1"
+authors = [
+  { name="Antonio Paolillo", email="antonio.paolillo@vub.be" },
+  { name="Aaron Bogaert", email="aaron.bogaert@vub.be" },
+]
+description = "MojoRT: Real-time benchmark and tooling for Mojo"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["mojort"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+exclude = '''venv'''
+
+[tool.isort]
+profile = "black"
+skip = [
+    "venv"
+]
+skip_glob = ["**/venv/**/*"]
