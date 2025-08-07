@@ -4,10 +4,9 @@ import pathlib
 import re
 from pathlib import Path
 from typing import Any, Dict, List
-
 import numpy as np
 from mojort.platforms import get_mojort_docker_platform_from
-from mojort.runners import get_mojort_runner, get_mojort_builder
+from mojort.runners import get_mojort_runner
 
 from benchkit.benchmark import Benchmark, RecordResult
 from benchkit.campaign import CampaignCartesianProduct
@@ -17,7 +16,7 @@ from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
 
 
-class LatencyBench(Benchmark):
+class ProgramCompareBench(Benchmark):
     def __init__(self, platform: Platform):
         super().__init__(
             command_wrappers=(),
@@ -40,16 +39,26 @@ class LatencyBench(Benchmark):
         src_filename: str,
         **kwargs,
     ) -> None:
-        lg_bench_dir = self._benchmark_dir / language
 
+        # -O flags are modeled as a seperate language but the folder is still the same
+        if language.startswith("cpp"):
+            language_folder = "cpp"
+        else:
+            language_folder = language
+
+        lg_bench_dir = self._benchmark_dir / language_folder
         if not self.platform.comm.isdir(path=lg_bench_dir):
             raise ValueError(
-                f"Language '{language}' not found as '{lg_bench_dir}' is not a directory"
+                f"Language '{language_folder}' not found as '{lg_bench_dir}' is not a directory"
             )
 
         match language:
-            case "c":
-                cmd = f"gcc -O3 -o {src_filename} {src_filename}.c"
+            case "cpp -O3":
+                cmd = f"g++ -O3 {src_filename}.cpp -o {src_filename}"
+            case "cpp -O1":
+                cmd = f"g++ -O1 {src_filename}.cpp -o {src_filename}"
+            case "cpp":
+                cmd = f"g++ {src_filename}.cpp -o {src_filename}"
             case "mojo":
                 mojo_bin = "/home/user/.mojort/.venv/bin"
                 cmd = f"{mojo_bin}/mojo build -o {src_filename} {src_filename}.mojo"
@@ -68,8 +77,15 @@ class LatencyBench(Benchmark):
         **kwargs,
     ) -> str | AsyncProcess:
         language: str = build_variables["language"]
+
+        # -O flags are modeled as a seperate language but the folder is still the same
+        if language.startswith("cpp"):
+            language_folder = "cpp"
+        else:
+            language_folder = language
+
         src_filename: str = build_variables["src_filename"]
-        lg_bench_dir = self._benchmark_dir / language
+        lg_bench_dir = self._benchmark_dir / language_folder
         cmd = [f"./{src_filename}"]
 
         output = self.platform.comm.shell(command=cmd, current_dir=lg_bench_dir)
@@ -85,19 +101,11 @@ class LatencyBench(Benchmark):
         record_data_dir: PathType,
         **kwargs,
     ) -> RecordResult:
-        latencies = [float(m) for m in re.findall(r"Latency = ([\d.]+) µs", command_output)]
-        total_match = re.search(r"Total latency: ([\d.]+) µs", command_output)
-        total_latency = float(total_match.group(1)) if total_match else None
-        latencies_np = np.array(latencies) if latencies else np.array([0.0])
+
+        runtime = [float(m) for m in re.findall(r"runtime: ([\d.]+) µs", command_output)]
 
         result = {
-            "latency_min": float(np.min(latencies_np)),
-            "latency_max": float(np.max(latencies_np)),
-            "latency_median": float(np.median(latencies_np)),
-            "latency_mean": float(np.mean(latencies_np)),
-            "latency_std": float(np.std(latencies_np, ddof=1)),  # sample stddev
-            "latency_sum": float(np.sum(latencies_np)),
-            "total_latency": total_latency,
+            "runtime": runtime,
         }
 
         return result
@@ -113,16 +121,15 @@ class LatencyBench(Benchmark):
 
 
 def main() -> None:
-    get_mojort_builder().build()
     runner = get_mojort_runner()
     platform = get_mojort_docker_platform_from(runner=runner)
     campaign = CampaignCartesianProduct(
         name="01_latency",
-        benchmark=LatencyBench(platform=platform),
-        nb_runs=50,
+        benchmark=ProgramCompareBench(platform=platform),
+        nb_runs=2,
         variables={
-            "language": ["c","mojo"],
-            "src_filename": ["sleep_interval"],
+            "language": ["mojo","cpp","cpp -O1","cpp -O3"],
+            "src_filename": ["n-body"],
         },
         constants={},
         debug=False,
@@ -130,13 +137,26 @@ def main() -> None:
         enable_data_dir=True,
     )
     campaign.run()
+
+    def test(dataframe):
+        for lan in dataframe["language"].unique():
+            mojodf = dataframe[dataframe.language == lan]
+            avg = np.average(mojodf['runtime'])
+            nw = (dataframe[dataframe.language == lan]['total_latency'] / avg) - 0
+            dataframe.loc[dataframe["language"] == lan,'normalized'] = nw
+        return dataframe
+
     campaign.generate_graph(
+        process_dataframe=test,
         plot_name="catplot",
-        title="Naive Latency Test",
-        kind="strip",
-        y="total_latency",
-        col="language",
+        title="% difference between average runtime for 3 body problem",
+        kind="violin",
+        ylabel='% between average en actual runtime',
+        y="normalized",
+        # col="language",
         hue="language",
+        # split=True,
+        inner="quart"
     )
 
 

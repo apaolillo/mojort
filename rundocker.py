@@ -12,7 +12,7 @@ def buildrun(
     docker_builder = get_mojort_builder()
     docker_builder.build()
 
-    docker_runner = get_mojort_runner(workdir=mojo_bench_path)
+    docker_runner = get_mojort_runner()
 
     cmd = docker_runner.get_command()
     print(" ".join(cmd))
