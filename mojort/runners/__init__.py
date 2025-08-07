@@ -34,6 +34,7 @@ def mojo_builder(
 
     mojo_config_path = "/home/${USER_NAME}/.mojort"
     venv_path = f"{mojo_config_path}/.venv"
+    builder.user()
     builder.run_multiple(
         commands=[
             f"mkdir -p {mojo_config_path}",
@@ -74,10 +75,17 @@ def get_mojort_builder(
 
     builder.desc("Install Mojo")
     builder |= mojo_builder(nightly=False)
-    builder.run(command='echo ". ~/.mojort/.venv/bin/activate" >> /home/${USER_NAME}/.bash_history')
+    mojo_venv_path = "~/.mojort/.venv"
+    pip3 = f"{mojo_venv_path}/bin/pip3"
+    builder.run(command=f'echo ". {mojo_venv_path}/bin/activate" >> /home/${{USER_NAME}}/.bash_history')
     builder.space()
 
-    builder.user()
+    builder.desc("Install Python packages")
+    builder.run(command=f"{pip3} install --upgrade pip")
+    requirements = sorted(line.strip() for line in Path("requirements.txt").read_text().splitlines())
+    requirements_str = " ".join(requirements)
+    builder.run(command=f"{pip3} install --upgrade {requirements_str}")
+
     builder.workdir("/home/${USER_NAME}")
     builder.space()
 
@@ -100,5 +108,7 @@ def get_mojort_runner(
         workdir=workdir,
     )
     runner |= gui_runner()
+    runner |= gpu_runner()
+    runner |= personal_runner()
 
     return runner
