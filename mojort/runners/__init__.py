@@ -5,8 +5,28 @@ from pythainer.examples.builders import get_user_gui_builder
 from pythainer.examples.runners import gpu_runner, gui_runner, personal_runner
 from pythainer.runners import ConcreteDockerRunner
 from pythainer.sysutils import PathType as PythainerPathType
-
+from pythainer.examples.builders import qemu_builder, qemu_dependencies
 from benchkit.utils.dir import gitmainrootdir
+
+
+def add_toyos(
+    builder: PartialDockerBuilder,
+) -> None:
+    embedded_packages = [
+        "gcc-aarch64-linux-gnu",
+        "gcc-arm-none-eabi",
+        "binutils-aarch64-linux-gnu",
+        "gcc-aarch64-linux-gnu",
+        "gdb-multiarch",
+        "device-tree-compiler",
+        "bsdextrautils",
+        "tio",
+    ]
+    packages = embedded_packages + qemu_dependencies()
+    builder.root()
+    builder.add_packages(packages=packages)
+    builder.user()
+    builder |= qemu_builder(version="10.0.2", cleanup=False)
 
 
 def mojo_builder(
@@ -85,6 +105,9 @@ def get_mojort_builder(
     requirements_str = " ".join(requirements)
     builder.run(command=f"{pip3} install --upgrade {requirements_str}")
 
+    builder.workdir("/home/${USER_NAME}/workspace")
+    add_toyos(builder=builder)
+
     builder.workdir("/home/${USER_NAME}")
     builder.space()
 
@@ -107,8 +130,8 @@ def get_mojort_runner(
         network="host",
         workdir=workdir,
     )
-    runner |= gui_runner()
-    runner |= gpu_runner()
-    runner |= personal_runner()
+    # runner |= gui_runner()
+    # runner |= gpu_runner()
+    # runner |= personal_runner()
 
     return runner
