@@ -6,10 +6,8 @@ import random
 import re
 from pathlib import Path
 from typing import Any, Dict, List
-from deps.pythainer.src.pythainer.runners import ConcreteDockerRunner, DockerRunner
-import numpy as np
 from mojort.platforms import get_mojort_docker_platform_from
-from mojort.runners import get_mojort_runner
+from mojort.runners import get_mojort_runner, get_mojort_builder
 
 import pandas as pd
 
@@ -22,6 +20,7 @@ from benchkit.utils.types import PathType
 
 SAMPLESIZE = 100_000
 DATASETREDUCTION = 0.95
+
 
 class ProgramCompareBench(Benchmark):
     def __init__(self, platform: Platform):
@@ -77,6 +76,7 @@ class ProgramCompareBench(Benchmark):
         self,
         build_variables: Dict[str, Any],
         threads,
+        lock_memory_alloc: bool,
         **kwargs,
     ) -> str | AsyncProcess:
         language: str = build_variables["language"]
@@ -88,10 +88,20 @@ class ProgramCompareBench(Benchmark):
 
         src_filename: str = build_variables["src_filename"]
         lg_bench_dir = self._benchmark_dir / language_folder
-        if language.startswith("c"):
-            cmd = ["sudo", f"./{src_filename}", "--nsecs", "-vn", "-i","100", "-p","99", "-t", f"{threads}", "--duration=1m"]
-        else:
-            cmd = ["sudo", "python3", f"./{src_filename}.py", f"{threads}"]
+
+        match language:
+            case "c":
+                cmd = ["sudo", f"./{src_filename}"]
+                cmd += ["--nsecs", "-vn", "-i","100", "-p","99", "-t", f"{threads}", "--duration=1m"]
+                if lock_memory_alloc:
+                    cmd += ["--mlockall"]
+            case "mojo":
+                if language == "mojo" and lock_memory_alloc:
+                    raise NotImplementedError('"--mlockall" not yet supported for Mojo.')
+                    # print('[WARNING] "--mlockall" not yet supported for Mojo.')
+                cmd = ["sudo", "python3", f"./{src_filename}.py", f"{threads}"]
+            case _:
+                raise ValueError(f"Unknown language '{language}'")
 
         output = self.platform.comm.shell(command=cmd, current_dir=lg_bench_dir,print_output = False)
 
@@ -138,56 +148,73 @@ class ProgramCompareBench(Benchmark):
 
     def get_run_var_names(self) -> List[str]:
         return [
-            "threads"
+            "threads",
+            "lock_memory_alloc",
         ]
 
 
 def main() -> None:
+    get_mojort_builder().build()
     runner = get_mojort_runner()
     platform = get_mojort_docker_platform_from(runner=runner)
+    kernel_version = platform.kernel_version()
     campaign = CampaignCartesianProduct(
         name="cyclictest",
         benchmark=ProgramCompareBench(platform=platform),
         nb_runs=1,
         variables={
-            "language": ["mojo","c"],
+            "language": [
+                "mojo",
+                "c",
+            ],
             "src_filename": ["cyclictest"],
             "threads":[1,2,3,4,],
+            "lock_memory_alloc": [
+                False,
+                # True,
+            ],
         },
-        constants={},
+        constants={
+            "kernel_version": kernel_version,
+        },
         debug=False,
         gdb=False,
         enable_data_dir=True,
+        continuing=False,
     )
     campaign.run()
 
     def load_data(dataframe):
         frames = []
-        for lan in dataframe["language"].unique():
-            landf = dataframe[dataframe.language == lan]
-            for threadcount in dataframe["threads"]:
-                thrdf = landf[dataframe.threads == threadcount]
-                path = thrdf.iloc[0]["datapath"]
-                with open(path,"r") as f:
-                    l = []
-                    for line in f:
-                        l.append({"language":lan,"latency":float(line),"threads":int(threadcount)})
-                    frames.append(pd.DataFrame(l))
-        return pd.concat(frames)
+        path_col = "datapath"
+        value_col = "latency"
+
+        for _, row in dataframe.iterrows():
+            path = Path(row[path_col])
+            with path.open("r") as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    new_row = row.to_dict()
+                    new_row[value_col] = float(line.strip())
+                    frames.append(new_row)
+        return pd.DataFrame(frames)
 
     campaign.generate_graph(
         process_dataframe=load_data,
         plot_name="catplot",
-        title="comparison between latency of c and mojo for cyclictest",
+        title=f"Comparing latencies of C and Mojo for cyclictest - {kernel_version} kernel",
         kind="violin",
         y="latency",
         x="threads",
         hue="language",
+        col="lock_memory_alloc",
         split=True,
         inner="quart",
         height=8.27,
         aspect=15/8.27,
     )
+
 
 if __name__ == "__main__":
     main()

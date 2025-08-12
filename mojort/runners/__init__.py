@@ -50,7 +50,7 @@ def mojo_builder(
     builder = PartialDockerBuilder()
 
     # Install Python and pip if not already present
-    builder.add_packages(packages=["python3", "python3-full", "python3-venv", "python3-pip","libnuma-dev"])
+    builder.add_packages(packages=["python3", "python3-full", "python3-venv", "python3-pip", "libnuma-dev"])
 
     mojo_config_path = "/home/${USER_NAME}/.mojort"
     venv_path = f"{mojo_config_path}/.venv"
@@ -101,7 +101,9 @@ def get_mojort_builder(
 
     builder.desc("Install Python packages")
     builder.run(command=f"{pip3} install --upgrade pip")
-    requirements = sorted(line.strip() for line in Path("requirements.txt").read_text().splitlines())
+
+    requirements_path = gitmainrootdir() / "requirements.txt"
+    requirements = sorted(line.strip() for line in requirements_path.read_text().splitlines())
     requirements_str = " ".join(requirements)
     builder.run(command=f"{pip3} install --upgrade {requirements_str}")
 

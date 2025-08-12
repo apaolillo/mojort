@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
 from mojort.runners import get_mojort_builder, get_mojort_runner
-from benchkit.utils.dir import gitmainrootdir
-from pathlib import Path
-from pythainer.runners import DockerRunner
 
 
 def buildrun(
