@@ -1,0 +1,12 @@
+file toyos.elf
+symbol-file toyos.elf
+
+set confirm off
+target remote :1234
+
+# Convenient breakpoints
+break _start
+
+# Layouts
+layout src
+layout regs
