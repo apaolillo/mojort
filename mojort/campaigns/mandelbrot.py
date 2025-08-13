@@ -9,6 +9,8 @@ import numpy as np
 from mojort.platforms import get_mojort_docker_platform_from
 from mojort.runners import get_mojort_runner
 
+import pandas as pd
+
 from benchkit.benchmark import Benchmark, RecordResult
 from benchkit.campaign import CampaignCartesianProduct
 from benchkit.platforms import Platform
@@ -56,6 +58,8 @@ class ProgramCompareBench(Benchmark):
             )
 
         match language:
+            case "cpp -Ofast":
+                cmd = f"g++ -Ofast {src_filename}.cpp -o {src_filename}"
             case "cpp -O3":
                 cmd = f"g++ -O3 {src_filename}.cpp -o {src_filename}"
             case "cpp -O2":
@@ -162,10 +166,9 @@ def main() -> None:
         benchmark=ProgramCompareBench(platform=platform),
         nb_runs=2,
         variables={
-            "language": ["cpp","cpp -O1","cpp -O2","cpp -O3","mojo","mojo -O1","mojo -O2","mojo -O3",],
+            "language": ["cpp","cpp -O3","cpp -Ofast","mojo","mojo -O3",],
             "src_filename": ["mandelbrot"],
-            # "size": [512,1024,2048],
-            "size": [2048,],
+            "size": [ x * 512 for x in range(1,11)],
         },
         constants={},
         debug=False,
@@ -178,14 +181,39 @@ def main() -> None:
     # this might be worth mentioning in the paper
 
     def test(dataframe):
-        dataframe = dataframe[dataframe['size'] == 2048]
+        sizes=dataframe["size"].unique()
+        sizes.sort()
+        dataframe = dataframe[dataframe['size'] == sizes[-1]]
         for lan in dataframe["language"].unique():
             mojodf = dataframe[dataframe.language == lan]
             avg = np.average(mojodf['runtime'])
-            nw = (dataframe[dataframe.language == lan]['runtime'] / avg) - 0
+            nw = (dataframe[dataframe.language == lan]['runtime'] / avg) - 1
             dataframe.loc[dataframe["language"] == lan,'normalized'] = nw
         print(dataframe)
         return dataframe
+
+
+    def speedup(dataframe):
+        sizes=dataframe["size"].unique()
+        sizes.sort()
+        frames = []
+        print("---------------------")
+        for lan in dataframe["language"].unique():
+            dataframemin = dataframe[dataframe['size'] == sizes[0]]
+            ref = sizes[0] * sizes[0]
+            mojodf = dataframemin[dataframemin.language == lan]
+            avg_min = np.average(mojodf['runtime'])
+            landf = dataframe[dataframe.language == lan]
+
+            for size in dataframe["size"].unique():
+                r = avg_min * ((size * size)/ref)
+                runtimes = landf[landf['size'] == size]["runtime"]/r
+                landf.loc[(landf["language"] == lan) & (landf['size'] == size),'computation_per_element'] = runtimes
+                frames.append(landf)
+        a = pd.concat(frames)
+        print(a)
+        b = a.dropna()
+        return b
 
     campaign.generate_graph(
         process_dataframe=test,
@@ -200,14 +228,21 @@ def main() -> None:
         inner="quart"
     )
 
-
-
     campaign.generate_graph(
         plot_name="barplot",
         x="size",
         y="runtime",
         hue="language",
     )
+
+    campaign.generate_graph(
+        process_dataframe=speedup,
+        plot_name="lineplot",
+        x="size",
+        hue="language",
+        y="computation_per_element",
+    )
+
     campaign.generate_graph(
         plot_name="barplot",
         x="language",
