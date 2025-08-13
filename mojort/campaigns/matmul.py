@@ -146,7 +146,7 @@ def main() -> None:
         debug=False,
         gdb=False,
         enable_data_dir=True,
-        continuing=True,
+        continuing=False,
     )
     campaign.run()
 
@@ -184,11 +184,13 @@ def main() -> None:
         y="runtime",
         hue="language",
     )
+    """
     campaign.generate_graph(
         plot_name="barplot",
         x="language",
         y="filesize",
     )
+    """
 
 
 if __name__ == "__main__":

@@ -139,8 +139,8 @@ def get_mojort_runner(
         network="host",
         workdir=workdir,
     )
+    runner |= gpu_runner()
     # runner |= gui_runner()
-    # runner |= gpu_runner()
     # runner |= personal_runner()
 
     return runner
