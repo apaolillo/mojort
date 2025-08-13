@@ -12,13 +12,13 @@ void uart_init(void) {
     // UART initialization is optional in QEMU
 }
 
-// Send a character
-void uart_send(char c) {
-    while (UART_FR & UART_FR_TXFF) {
-        // Wait until the Transmit FIFO is not full
-    }
-    UART_DR = c;
-}
+//// Send a character
+//void uart_send(char c) {
+//    while (UART_FR & UART_FR_TXFF) {
+//        // Wait until the Transmit FIFO is not full
+//    }
+//    UART_DR = c;
+//}
 
 // Receive a character
 char uart_receive(void) {
