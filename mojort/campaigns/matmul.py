@@ -117,8 +117,7 @@ def main() -> None:
     campaign = CampaignCartesianProduct(
         name="matmul",
         benchmark=ProgramCompareBench(platform=platform),
-        #nb_runs=20,
-        nb_runs=1,
+        nb_runs=20,
         variables={
             "size": [16, 32],
             "language": [
