@@ -99,14 +99,6 @@ def get_mojort_builder(
     builder.run(command=f'echo ". {mojo_venv_path}/bin/activate" >> /home/${{USER_NAME}}/.bash_history')
     builder.space()
 
-    builder.desc("Install Python packages")
-    builder.run(command=f"{pip3} install --upgrade pip")
-
-    requirements_path = gitmainrootdir() / "requirements.txt"
-    requirements = sorted(line.strip() for line in requirements_path.read_text().splitlines())
-    requirements_str = " ".join(requirements)
-    builder.run(command=f"{pip3} install --upgrade {requirements_str}")
-
     builder.workdir("/home/${USER_NAME}/workspace")
     add_toyos(builder=builder)
 
@@ -117,6 +109,13 @@ def get_mojort_builder(
     builder.root()
     builder.add_packages(packages=["clang"])
     builder.user()
+
+    builder.desc("Install Python packages")
+    builder.run(command=f"{pip3} install --upgrade pip")
+    requirements_path = gitmainrootdir() / "requirements.txt"
+    requirements = sorted(line.strip() for line in requirements_path.read_text().splitlines())
+    requirements_str = " ".join(requirements)
+    builder.run(command=f"{pip3} install --upgrade {requirements_str}")
 
     builder.workdir("/home/${USER_NAME}")
     builder.space()

@@ -204,13 +204,15 @@ def main() -> None:
     campaign = CampaignCartesianProduct(
         name="01_latency",
         benchmark=ProgramCompareBench(platform=platform),
-        nb_runs=2,
+        nb_runs=20,
         variables={
+            "size": [128, 512],
             "language": [
                 # --- C++ GCC
                 "cpp-gcc", "cpp-gcc -O1", "cpp-gcc -O2", "cpp-gcc -O3",
                 # --- C++ Clang
-                "cpp-clang", "cpp-clang -O1", "cpp-clang -O2", "cpp-clang -O3", "cpp -Ofast",
+                "cpp-clang", "cpp-clang -O1", "cpp-clang -O2", "cpp-clang -O3",
+                #"cpp -Ofast",
 
                 # --- C GCC
                 "c-gcc", "c-gcc -O1", "c-gcc -O2", "c-gcc -O3",
@@ -225,9 +227,7 @@ def main() -> None:
             ],
             "src_filename": ["mandelbrot"],
             #"size": [ x * 512 for x in range(1,11)],
-            # "size": [512,1024,2048],
-            #"size": [2048,],
-            "size": [120,],
+            #"size": [512, 1024, 2048],
         },
         constants={},
         debug=False,
