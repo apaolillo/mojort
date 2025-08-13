@@ -5,7 +5,7 @@ from pythainer.examples.builders import get_user_gui_builder
 from pythainer.examples.runners import gpu_runner, gui_runner, personal_runner
 from pythainer.runners import ConcreteDockerRunner
 from pythainer.sysutils import PathType as PythainerPathType
-from pythainer.examples.builders import qemu_builder, qemu_dependencies
+from pythainer.examples.builders import qemu_builder, qemu_dependencies, rust_builder
 from benchkit.utils.dir import gitmainrootdir
 
 
@@ -109,6 +109,14 @@ def get_mojort_builder(
 
     builder.workdir("/home/${USER_NAME}/workspace")
     add_toyos(builder=builder)
+
+    # Install Rust
+    builder.desc("Rust")
+    builder |= rust_builder()
+
+    builder.root()
+    builder.add_packages(packages=["clang"])
+    builder.user()
 
     builder.workdir("/home/${USER_NAME}")
     builder.space()

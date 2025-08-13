@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-import os
 import pathlib
 import re
 from pathlib import Path
 from typing import Any, Dict, List
 import numpy as np
 from mojort.platforms import get_mojort_docker_platform_from
-from mojort.runners import get_mojort_runner
+from mojort.runners import get_mojort_runner, get_mojort_builder
 
 import pandas as pd
 
@@ -36,20 +35,28 @@ class ProgramCompareBench(Benchmark):
     def bench_src_path(self) -> pathlib.Path:
         return self._src_path
 
+    @staticmethod
+    def _language2foldername(language: str) -> str:
+        # -O flags are modeled as a seperate language but the folder is still the same
+        if language.startswith("cpp"):
+            language_folder = "cpp"
+        elif language.startswith("mojo"):
+            language_folder = "mojo"
+        elif language.startswith("c-"):
+            language_folder = "c"
+        elif language.startswith("rust"):
+            language_folder = "rust"
+        else:
+            language_folder = language
+        return language_folder
+
     def build_bench(
         self,
         language: str,
         src_filename: str,
         **kwargs,
     ) -> None:
-
-        # -O flags are modeled as a seperate language but the folder is still the same
-        if language.startswith("cpp"):
-            language_folder = "cpp"
-        elif language.startswith("mojo"):
-            language_folder = "mojo"
-        else:
-            language_folder = language
+        language_folder = self._language2foldername(language)
 
         lg_bench_dir = self._benchmark_dir / language_folder
         if not self.platform.comm.isdir(path=lg_bench_dir):
@@ -58,16 +65,59 @@ class ProgramCompareBench(Benchmark):
             )
 
         match language:
+            # --- C++ GCC
             case "cpp -Ofast":
                 cmd = f"g++ -Ofast {src_filename}.cpp -o {src_filename}"
-            case "cpp -O3":
+            case "cpp-gcc -O3":
                 cmd = f"g++ -O3 {src_filename}.cpp -o {src_filename}"
-            case "cpp -O2":
+            case "cpp-gcc -O2":
                 cmd = f"g++ -O2 {src_filename}.cpp -o {src_filename}"
-            case "cpp -O1":
+            case "cpp-gcc -O1":
                 cmd = f"g++ -O1 {src_filename}.cpp -o {src_filename}"
-            case "cpp":
+            case "cpp-gcc":
                 cmd = f"g++ {src_filename}.cpp -o {src_filename}"
+
+            # --- C++ Clang
+            case "cpp-clang -O3":
+                cmd = f"clang++ -O3 {src_filename}.cpp -o {src_filename}"
+            case "cpp-clang -O2":
+                cmd = f"clang++ -O2 {src_filename}.cpp -o {src_filename}"
+            case "cpp-clang -O1":
+                cmd = f"clang++ -O1 {src_filename}.cpp -o {src_filename}"
+            case "cpp-clang":
+                cmd = f"clang++ {src_filename}.cpp -o {src_filename}"
+
+            # --- C GCC
+            case "c-gcc -O3":
+                cmd = f"gcc -O3 -std=c11 -D_GNU_SOURCE {src_filename}.c -lm -o {src_filename}"
+            case "c-gcc -O2":
+                cmd = f"gcc -O2 -std=c11 -D_GNU_SOURCE {src_filename}.c -lm -o {src_filename}"
+            case "c-gcc -O1":
+                cmd = f"gcc -O1 -std=c11 -D_GNU_SOURCE {src_filename}.c -lm -o {src_filename}"
+            case "c-gcc":
+                cmd = f"gcc -std=c11 -D_GNU_SOURCE {src_filename}.c -lm -o {src_filename}"
+
+            # --- C Clang
+            case "c-clang -O3":
+                cmd = f"clang -O3 -std=c11 -D_GNU_SOURCE {src_filename}.c -lm -o {src_filename}"
+            case "c-clang -O2":
+                cmd = f"clang -O2 -std=c11 -D_GNU_SOURCE {src_filename}.c -lm -o {src_filename}"
+            case "c-clang -O1":
+                cmd = f"clang -O1 -std=c11 -D_GNU_SOURCE {src_filename}.c -lm -o {src_filename}"
+            case "c-clang":
+                cmd = f"clang -std=c11 -D_GNU_SOURCE {src_filename}.c -lm -o {src_filename}"
+
+            # --- Rust
+            case "rust -O3":
+                cmd = f"rustc -C opt-level=3 {src_filename}.rs -o {src_filename}"
+            case "rust -O2":
+                cmd = f"rustc -C opt-level=2 {src_filename}.rs -o {src_filename}"
+            case "rust -O1":
+                cmd = f"rustc -C opt-level=1 {src_filename}.rs -o {src_filename}"
+            case "rust":
+                cmd = f"rustc {src_filename}.rs -o {src_filename}"
+
+            # --- Mojo
             case "mojo":
                 mojo_bin = "/home/user/.mojort/.venv/bin"
                 cmd = f"{mojo_bin}/mojo build -O 0 -o {src_filename} {src_filename}.mojo"
@@ -80,6 +130,7 @@ class ProgramCompareBench(Benchmark):
             case "mojo -O3":
                 mojo_bin = "/home/user/.mojort/.venv/bin"
                 cmd = f"{mojo_bin}/mojo build -O 3 -o {src_filename} {src_filename}.mojo"
+
             case _:
                 raise ValueError(f"Unknown language '{language}'")
 
@@ -96,14 +147,7 @@ class ProgramCompareBench(Benchmark):
         **kwargs,
     ) -> str | AsyncProcess:
         language: str = build_variables["language"]
-
-        # -O flags are modeled as a seperate language but the folder is still the same
-        if language.startswith("cpp"):
-            language_folder = "cpp"
-        elif language.startswith("mojo"):
-            language_folder = "mojo"
-        else:
-            language_folder = language
+        language_folder = self._language2foldername(language)
 
         src_filename: str = build_variables["src_filename"]
         lg_bench_dir = self._benchmark_dir / language_folder
@@ -127,12 +171,7 @@ class ProgramCompareBench(Benchmark):
 
 
         language: str = build_variables["language"]
-        if language.startswith("cpp"):
-            language_folder = "cpp"
-        elif language.startswith("mojo"):
-            language_folder = "mojo"
-        else:
-            language_folder = language
+        language_folder = self._language2foldername(language)
 
         src_filename: str = build_variables["src_filename"]
         lg_bench_dir = self._benchmark_dir / language_folder
@@ -159,6 +198,7 @@ class ProgramCompareBench(Benchmark):
 
 
 def main() -> None:
+    get_mojort_builder().build()
     runner = get_mojort_runner()
     platform = get_mojort_docker_platform_from(runner=runner)
     campaign = CampaignCartesianProduct(
@@ -166,14 +206,34 @@ def main() -> None:
         benchmark=ProgramCompareBench(platform=platform),
         nb_runs=2,
         variables={
-            "language": ["cpp","cpp -O3","cpp -Ofast","mojo","mojo -O3",],
+            "language": [
+                # --- C++ GCC
+                "cpp-gcc", "cpp-gcc -O1", "cpp-gcc -O2", "cpp-gcc -O3",
+                # --- C++ Clang
+                "cpp-clang", "cpp-clang -O1", "cpp-clang -O2", "cpp-clang -O3", "cpp -Ofast",
+
+                # --- C GCC
+                "c-gcc", "c-gcc -O1", "c-gcc -O2", "c-gcc -O3",
+                # --- C Clang
+                "c-clang", "c-clang -O1", "c-clang -O2", "c-clang -O3",
+
+                # --- Rust
+                "rust", "rust -O1", "rust -O2", "rust -O3",
+
+                # --- Mojo
+                "mojo", "mojo -O1", "mojo -O2", "mojo -O3",
+            ],
             "src_filename": ["mandelbrot"],
-            "size": [ x * 512 for x in range(1,11)],
+            #"size": [ x * 512 for x in range(1,11)],
+            # "size": [512,1024,2048],
+            #"size": [2048,],
+            "size": [120,],
         },
         constants={},
         debug=False,
         gdb=False,
         enable_data_dir=True,
+        continuing=False,
     )
     campaign.run()
 
