@@ -8,12 +8,16 @@ struct Matrix {
 }
 
 impl Matrix {
-    fn new(w: usize, h: usize) -> Self {
+    fn new(w: usize, h: usize,initempty:bool) -> Self {
         let mut data = vec![0i32; w * h];
         // Mirrors: data[i*w + j] = i + j
         for i in 0..h {
             for j in 0..w {
-                data[i * w + j] = (i + j) as i32;
+                if initempty {
+                    data[i * w + j] = 0 as i32;
+                } else {
+                    data[i * w + j] = (i + j) as i32;
+                }
             }
         }
         Self { w, h, data }
@@ -41,9 +45,9 @@ fn main() {
     let n = m;
     let k = n;
 
-    let a = Matrix::new(m, n);
-    let b = Matrix::new(n, k);
-    let mut c = Matrix::new(m, k);
+    let a = Matrix::new(m, n,false);
+    let b = Matrix::new(n, k,false);
+    let mut c = Matrix::new(m, k,true);
 
     let t0 = Instant::now();
 
@@ -52,7 +56,7 @@ fn main() {
     for mi in 0..m {
         for ni in 0..n {
             for ki in 0..k {
-                let val = a.gt(mi, ki) * b.gt(ki, ni) + c.gt(mi, ni);
+                let val = a.gt(mi, ni) * b.gt(ki, ni) + c.gt(mi, ni);
                 c.st(mi, ki, val);
             }
         }

@@ -19,7 +19,7 @@ static inline int64_t now_us(void) {
     return (int64_t)ts.tv_sec * 1000000LL + ts.tv_nsec / 1000LL;
 }
 
-static Matrix matrix_new(int w, int h) {
+static Matrix matrix_new(int w, int h,int initempty) {
     Matrix m;
     m.w = w;
     m.h = h;
@@ -31,7 +31,11 @@ static Matrix matrix_new(int w, int h) {
     // Mirror the C++ constructor: data[i*w + j] = i + j
     for (int i = 0; i < h; ++i) {
         for (int j = 0; j < w; ++j) {
-            m.data[i * w + j] = i + j;
+            if ( initempty) {
+                m.data[i * w + j] = 0;
+            } else {
+                m.data[i * w + j] = i + j;
+            }
         }
     }
     return m;
@@ -66,9 +70,9 @@ int main(int argc, char *argv[]) {
     int N = M;
     int K = N;
 
-    Matrix a = matrix_new(M, N);
-    Matrix b = matrix_new(N, K);
-    Matrix c = matrix_new(M, K);
+    Matrix a = matrix_new(M, N, 0);
+    Matrix b = matrix_new(N, K, 0);
+    Matrix c = matrix_new(M, K, 0);
 
     int64_t t1 = now_us();
 
@@ -78,7 +82,7 @@ int main(int argc, char *argv[]) {
     for (int m = 0; m < M; m++) {
         for (int n = 0; n < N; n++) {
             for (int k = 0; k < K; k++) {
-                int val = matrix_gt(&a, m, k) * matrix_gt(&b, k, n) + matrix_gt(&c, m, n);
+                int val = matrix_gt(&a, m, n) * matrix_gt(&b, k, n) + matrix_gt(&c, m, n);
                 matrix_st(&c, m, k, val);
             }
         }
