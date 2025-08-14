@@ -48,12 +48,14 @@ def mandelbrot_campaign(
         ),
         nb_runs=nb_runs,
         variables={
-            "size": [128, 512],
+            "size": [
+                256,
+                512,
+                # 1024,
+            ],
             "language": languages,
             "src_filename": ["mandelbrot"],
             "master_thread_core": master_thread_core,
-            #"size": [ x * 512 for x in range(1,11)],
-            #"size": [512, 1024, 2048],
         },
         constants={},
         debug=False,
@@ -75,12 +77,14 @@ def matmul_campaign(
         ),
         nb_runs=nb_runs,
         variables={
-            "size": [16, 32],
+            "size": [
+                256,
+                512,
+                # 1024,
+            ],
             "language": languages,
             "src_filename": ["matmul"],
             "master_thread_core": master_thread_core,
-            # "size": [512,1024,2048],
-            #"size": [512,],
         },
         constants={},
         debug=False,
@@ -93,9 +97,6 @@ def kmp_campaign(
     platform: Platform,
     wrappers: list[CommandWrapper],
 ) -> CampaignCartesianProduct:
-    # TODO add implementation in C & Rust
-    filtered_languages = [l for l in languages if not l.startswith("c-") and not l.startswith("rust")]
-
     return CampaignCartesianProduct(
         name="13_kmp",
         benchmark=KmpBench(
@@ -104,8 +105,12 @@ def kmp_campaign(
         ),
         nb_runs=nb_runs,
         variables={
-            "size": [128, 512],
-            "language": filtered_languages,
+            "size": [
+                0.2,
+                0.5,
+                # 1.0,
+            ],
+            "language": languages,
             "src_filename": ["knmp"],
             "master_thread_core": master_thread_core,
         },

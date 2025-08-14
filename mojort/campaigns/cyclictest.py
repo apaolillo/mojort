@@ -183,7 +183,7 @@ def main() -> None:
             "src_filename": ["cyclictest"],
             "threads":[1,2,3,4,],
             "lock_memory_alloc": [
-                False,
+                # False,
                 True,
             ],
         },
