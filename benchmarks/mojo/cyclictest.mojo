@@ -32,6 +32,12 @@ def set_scheduling_policy():
 
     r = sys.external_call["sched_setscheduler", Int32](Int(0),Int(1), Pointer(to=Int(99)))
 
+def lock_pages():
+    r = sys.external_call["mlockall", Int32](Int(3))
+
+def unlock_pages():
+    r = sys.external_call["munlockall", Int32]()
+
 def get_time_sys(ts:_CTimeSpec):
     _ = sys.external_call["clock_gettime", Int32](Int32(1), Pointer(to=ts))
 
@@ -86,6 +92,10 @@ def threadstart():
 
 def main():
     try:
+        if len(argv()) > 2:
+            lock_pages()
         threadstart()
+        if len(argv()) > 2:
+            unlock_pages()
     except e:
         print(e)

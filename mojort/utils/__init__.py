@@ -1,4 +1,7 @@
 
+import subprocess
+
+
 def language2foldername(language: str) -> str:
     # -O flags are modeled as a seperate language but the folder is still the same
     if language.startswith("cpp"):
@@ -86,3 +89,11 @@ def language2cmdline(
             raise ValueError(f"Unknown language '{language}'")
 
     return cmd
+
+def stress_prerun_hook(
+        build_variables,
+        run_variables,
+        other_variables,
+        record_data_dir,
+    ) -> None:
+     subprocess.Popen("stress-ng --cpu 0 --cpu-method all -t 65", shell=True,stdout=None,stderr=None)

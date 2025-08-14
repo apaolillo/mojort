@@ -5,31 +5,42 @@ import pathlib
 import random
 import re
 from pathlib import Path
+import subprocess
 from typing import Any, Dict, List
 from mojort.platforms import get_mojort_docker_platform_from
 from mojort.runners import get_mojort_runner, get_mojort_builder
 
-import pandas as pd
 
+import pandas as pd
+from benchkit.platforms import get_current_platform
+from benchkit.hooks.stressNg import StressNgPreHook, StressNgPostHook
+from benchkit.dependencies.packages import PackageDependency
+from benchkit.shell.shell import shell_out
 from benchkit.benchmark import Benchmark, RecordResult
 from benchkit.campaign import CampaignCartesianProduct
 from benchkit.platforms import Platform
 from benchkit.shell.shellasync import AsyncProcess
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
+from mojort.utils import stress_prerun_hook
 
 SAMPLESIZE = 100_000
 DATASETREDUCTION = 0.95
 
 
+
 class ProgramCompareBench(Benchmark):
-    def __init__(self, platform: Platform):
+    def __init__(self, platform: Platform,
+        duration = 60,
+        buckets=42,
+        percentile=0.95,
+    ):
         super().__init__(
             command_wrappers=(),
             command_attachments=(),
             shared_libs=(),
-            pre_run_hooks=(),
-            post_run_hooks=(),
+            pre_run_hooks=[stress_prerun_hook],
+            post_run_hooks=[],
         )
         self.platform = platform
         self._src_path = gitmainrootdir() / "benchmarks"
@@ -96,16 +107,18 @@ class ProgramCompareBench(Benchmark):
                 if lock_memory_alloc:
                     cmd += ["--mlockall"]
             case "mojo":
-                if language == "mojo" and lock_memory_alloc:
-                    raise NotImplementedError('"--mlockall" not yet supported for Mojo.')
-                    # print('[WARNING] "--mlockall" not yet supported for Mojo.')
                 cmd = ["sudo", "python3", f"./{src_filename}.py", f"{threads}"]
+                if lock_memory_alloc:
+                    cmd += ["--mlockall"]
+
             case _:
                 raise ValueError(f"Unknown language '{language}'")
-
         output = self.platform.comm.shell(command=cmd, current_dir=lg_bench_dir,print_output = False)
 
         return output
+
+    # def dependencies(self) -> List[PackageDependency]:
+    #     return super().dependencies() + [PackageDependency("stress-ng")]
 
     def parse_output_to_results(
         self,
@@ -171,7 +184,7 @@ def main() -> None:
             "threads":[1,2,3,4,],
             "lock_memory_alloc": [
                 False,
-                # True,
+                True,
             ],
         },
         constants={
