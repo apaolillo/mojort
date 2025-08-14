@@ -115,5 +115,6 @@ class KmpBench(Benchmark):
 
     def get_run_var_names(self) -> List[str]:
         return [
+            "size",# TODO for now it is ignored
             "master_thread_core",
         ]

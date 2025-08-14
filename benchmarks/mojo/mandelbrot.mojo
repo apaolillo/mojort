@@ -14,7 +14,7 @@ fn mandelbrot_complex(c: ComplexFloat64) -> Int:
       nv += 1
     return nv
 
-fn mandelbrot_split(real:Float64, imag:Float64) -> Int:
+fn mandelbrot_split(real: Float64, imag: Float64) -> Int:
   var nv = 0
   var zReal:Float64 = real
   var zImag:Float64 = imag

@@ -32,6 +32,9 @@ languages = [
     "mojo", "mojo -O1", "mojo -O2", "mojo -O3",
 ]
 
+# nb_runs = 2
+# languages = ["mojo -O3"]
+
 
 def mandelbrot_campaign(
     platform: Platform,
@@ -90,6 +93,9 @@ def kmp_campaign(
     platform: Platform,
     wrappers: list[CommandWrapper],
 ) -> CampaignCartesianProduct:
+    # TODO add implementation in C & Rust
+    filtered_languages = [l for l in languages if not l.startswith("c-") and not l.startswith("rust")]
+
     return CampaignCartesianProduct(
         name="13_kmp",
         benchmark=KmpBench(
@@ -98,7 +104,8 @@ def kmp_campaign(
         ),
         nb_runs=nb_runs,
         variables={
-            "language": languages,
+            "size": [128, 512],
+            "language": filtered_languages,
             "src_filename": ["knmp"],
             "master_thread_core": master_thread_core,
         },
@@ -127,9 +134,9 @@ def main() -> None:
         )
 
     campaigns = [
-        campaign(mandelbrot_campaign),
-        campaign(matmul_campaign),
         campaign(kmp_campaign),
+        campaign(matmul_campaign),
+        campaign(mandelbrot_campaign),
     ]
 
     suite = CampaignSuite(campaigns=campaigns)
