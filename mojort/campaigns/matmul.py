@@ -12,7 +12,7 @@ def main() -> None:
     platform = get_mojort_docker_platform_from(runner=runner)
     campaign = CampaignCartesianProduct(
         name="matmul",
-        benchmark=MatmulBench(platform=platform),
+        benchmark=MatmulBench([],platform=platform),
         nb_runs=20,
         variables={
             "size": [16, 32],

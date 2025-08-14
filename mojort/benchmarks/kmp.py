@@ -54,6 +54,7 @@ class KmpBench(Benchmark):
     def single_run(
         self,
         build_variables: Dict[str, Any],
+        size,
         **kwargs,
     ) -> str:
 
@@ -62,7 +63,7 @@ class KmpBench(Benchmark):
 
         src_filename: str = build_variables["src_filename"]
         lg_bench_dir = self._benchmark_dir / language_folder
-        cmd = [f"./{src_filename}",]
+        cmd = [f"./{src_filename}",f"{size}"]
 
         environment = self._preload_env(**kwargs)
         wrapped_run_command, wrapped_environment = self._wrap_command(
@@ -115,6 +116,6 @@ class KmpBench(Benchmark):
 
     def get_run_var_names(self) -> List[str]:
         return [
-            "size",# TODO for now it is ignored
+            "size",
             "master_thread_core",
         ]

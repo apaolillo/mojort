@@ -14,7 +14,7 @@ def main() -> None:
     platform = get_mojort_docker_platform_from(runner=runner)
     campaign = CampaignCartesianProduct(
         name="01_latency",
-        benchmark=MandelbrotBench(platform=platform),
+        benchmark=MandelbrotBench([],platform=platform),
         nb_runs=20,
         variables={
             "size": [128, 512],

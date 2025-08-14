@@ -12,8 +12,8 @@ def main() -> None:
     platform = get_mojort_docker_platform_from(runner=runner)
     campaign = CampaignCartesianProduct(
         name="knmp",
-        benchmark=KmpBench(platform=platform),
-        nb_runs=20,
+        benchmark=KmpBench([],platform=platform),
+        nb_runs=2,
         variables={
             "language": [
                 # --- C++ GCC
@@ -32,6 +32,9 @@ def main() -> None:
 
                 # --- Mojo
                 "mojo", "mojo -O1", "mojo -O2", "mojo -O3",
+            ],
+            "size": [
+                0.5, 1,
             ],
             "src_filename": ["knmp"],
         },
@@ -67,8 +70,9 @@ def main() -> None:
 
     campaign.generate_graph(
         plot_name="barplot",
-        x="language",
+        x="size",
         y="runtime",
+        hue="language",
     )
 
     # campaign.generate_graph(
