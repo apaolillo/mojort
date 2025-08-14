@@ -56,8 +56,8 @@ fn main() {
     for mi in 0..m {
         for ni in 0..n {
             for ki in 0..k {
-                let val = a.gt(mi, ni) * b.gt(ki, ni) + c.gt(mi, ni);
-                c.st(mi, ki, val);
+                let val = a.gt(mi, ki) * b.gt(ki, ni) + c.gt(mi, ni);
+                c.st(mi, ni, val);
             }
         }
     }

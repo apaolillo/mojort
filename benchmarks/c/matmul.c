@@ -31,7 +31,7 @@ static Matrix matrix_new(int w, int h,int initempty) {
     // Mirror the C++ constructor: data[i*w + j] = i + j
     for (int i = 0; i < h; ++i) {
         for (int j = 0; j < w; ++j) {
-            if ( initempty) {
+            if (initempty) {
                 m.data[i * w + j] = 0;
             } else {
                 m.data[i * w + j] = i + j;
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 
     Matrix a = matrix_new(M, N, 0);
     Matrix b = matrix_new(N, K, 0);
-    Matrix c = matrix_new(M, K, 0);
+    Matrix c = matrix_new(M, K, 1);
 
     int64_t t1 = now_us();
 
@@ -82,8 +82,8 @@ int main(int argc, char *argv[]) {
     for (int m = 0; m < M; m++) {
         for (int n = 0; n < N; n++) {
             for (int k = 0; k < K; k++) {
-                int val = matrix_gt(&a, m, n) * matrix_gt(&b, k, n) + matrix_gt(&c, m, n);
-                matrix_st(&c, m, k, val);
+                int val = matrix_gt(&a, m, k) * matrix_gt(&b, k, n) + matrix_gt(&c, m, n);
+                matrix_st(&c, m, n, val);
             }
         }
     }
