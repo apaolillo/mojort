@@ -32,9 +32,6 @@ languages = [
     "mojo", "mojo -O1", "mojo -O2", "mojo -O3",
 ]
 
-# nb_runs = 2
-# languages = ["mojo -O3"]
-
 
 def mandelbrot_campaign(
     platform: Platform,
