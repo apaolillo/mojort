@@ -45,11 +45,6 @@ vector<int> KMP(string pattern,
     vector<int> LPS(m);
     computeLPSArray(pattern, m, LPS);
 
-    for (auto i : LPS)
-        cout << i << "\n";
-    cout << "---------------" << "\n";
-
-
     int i = 0; // index for text
     int j = 0; // index for pattern
     while (i < n) {
@@ -102,7 +97,7 @@ int main(int argc, char *argv[]) {
 
     auto t1 = high_resolution_clock::now();
     vector<int> ans = KMP(pattern, text);
-        auto t2 = high_resolution_clock::now();
+    auto t2 = high_resolution_clock::now();
 
     /* Getting number of milliseconds as a double. */
     duration<double, std::milli> ms_double = t2 - t1;

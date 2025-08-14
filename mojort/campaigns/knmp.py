@@ -22,13 +22,13 @@ def main() -> None:
                 "cpp-clang", "cpp-clang -O1", "cpp-clang -O2", "cpp-clang -O3",
                 #"cpp -Ofast",
 
-                # # --- C GCC
-                # "c-gcc", "c-gcc -O1", "c-gcc -O2", "c-gcc -O3",
-                # # --- C Clang
-                # "c-clang", "c-clang -O1", "c-clang -O2", "c-clang -O3",
+                # --- C GCC
+                "c-gcc", "c-gcc -O1", "c-gcc -O2", "c-gcc -O3",
+                # --- C Clang
+                "c-clang", "c-clang -O1", "c-clang -O2", "c-clang -O3",
 
-                # # --- Rust
-                # "rust", "rust -O1", "rust -O2", "rust -O3",
+                # --- Rust
+                "rust", "rust -O1", "rust -O2", "rust -O3",
 
                 # --- Mojo
                 "mojo", "mojo -O1", "mojo -O2", "mojo -O3",
