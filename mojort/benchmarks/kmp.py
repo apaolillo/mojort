@@ -1,17 +1,21 @@
 import re
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Iterable
 from mojort.utils import language2cmdline, language2foldername
-from benchkit.benchmark import Benchmark, RecordResult
+from benchkit.benchmark import Benchmark, RecordResult, CommandWrapper
 from benchkit.platforms import Platform
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
 
 
 class KmpBench(Benchmark):
-    def __init__(self, platform: Platform):
+    def __init__(
+        self,
+        command_wrappers: Iterable[CommandWrapper],
+        platform: Platform,
+    ) -> None:
         super().__init__(
-            command_wrappers=(),
+            command_wrappers=command_wrappers,
             command_attachments=(),
             shared_libs=(),
             pre_run_hooks=(),
@@ -31,7 +35,6 @@ class KmpBench(Benchmark):
         src_filename: str,
         **kwargs,
     ) -> None:
-
         language_folder = language2foldername(language)
 
         lg_bench_dir = self._benchmark_dir / language_folder
@@ -61,7 +64,20 @@ class KmpBench(Benchmark):
         lg_bench_dir = self._benchmark_dir / language_folder
         cmd = [f"./{src_filename}",]
 
-        output = self.platform.comm.shell(command=cmd, current_dir=lg_bench_dir)
+        environment = self._preload_env(**kwargs)
+        wrapped_run_command, wrapped_environment = self._wrap_command(
+            run_command=cmd,
+            environment=environment,
+            **kwargs,
+        )
+        output = self.run_bench_command(
+            run_command=cmd,
+            wrapped_run_command=wrapped_run_command,
+            current_dir=lg_bench_dir,
+            environment=environment,
+            wrapped_environment=wrapped_environment,
+            print_output=False,
+        )
 
         return output
 
@@ -99,4 +115,5 @@ class KmpBench(Benchmark):
 
     def get_run_var_names(self) -> List[str]:
         return [
+            "master_thread_core",
         ]

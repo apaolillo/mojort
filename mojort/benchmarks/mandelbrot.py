@@ -1,17 +1,21 @@
-from benchkit.benchmark import Benchmark, RecordResult
+from benchkit.benchmark import Benchmark, RecordResult, CommandWrapper
 from benchkit.platforms import Platform
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
 from pathlib import Path
 from mojort.utils import language2foldername, language2cmdline
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Iterable
 import re
 
 
 class MandelbrotBench(Benchmark):
-    def __init__(self, platform: Platform):
+    def __init__(
+        self,
+        command_wrappers: Iterable[CommandWrapper],
+        platform: Platform,
+    ) -> None:
         super().__init__(
-            command_wrappers=(),
+            command_wrappers=command_wrappers,
             command_attachments=(),
             shared_libs=(),
             pre_run_hooks=(),
@@ -60,7 +64,20 @@ class MandelbrotBench(Benchmark):
         lg_bench_dir = self._benchmark_dir / language_folder
         cmd = [f"./{src_filename}",f'{size}']
 
-        output = self.platform.comm.shell(command=cmd, current_dir=lg_bench_dir)
+        environment = self._preload_env(**kwargs)
+        wrapped_run_command, wrapped_environment = self._wrap_command(
+            run_command=cmd,
+            environment=environment,
+            **kwargs,
+        )
+        output = self.run_bench_command(
+            run_command=cmd,
+            wrapped_run_command=wrapped_run_command,
+            current_dir=lg_bench_dir,
+            environment=environment,
+            wrapped_environment=wrapped_environment,
+            print_output=False,
+        )
 
         return output
 
@@ -100,5 +117,6 @@ class MandelbrotBench(Benchmark):
 
     def get_run_var_names(self) -> List[str]:
         return [
-            "size"
+            "master_thread_core",
+            "size",
         ]
