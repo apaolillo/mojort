@@ -76,16 +76,8 @@ class MatmulGpu(Benchmark):
     ) -> RecordResult:
         print(command_output)
         runtime = [float(m) for m in re.findall(r"runtime: ([\d.]+) µs", command_output)][0]
-        #language: str = build_variables["language"]
-        #language_folder = language2foldername(language)
 
-        #src_filename: str = build_variables["src_filename"]
-        #lg_bench_dir = self._benchmark_dir / language_folder
-        #cmd = ["du",f"{src_filename}",]
-        #output = self.platform.comm.shell(command=cmd, current_dir=lg_bench_dir)
-        #size = [float(m) for m in re.findall(r"([\d.]+) *", output)][0]
         result = {
-            #"filesize": size,
             "runtime": runtime,
         }
 
