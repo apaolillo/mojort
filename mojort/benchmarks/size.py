@@ -124,7 +124,16 @@ class SizeBench(Benchmark):
 
         src_filename: str = build_variables["src_filename"]
         lg_bench_dir = self._benchmark_dir / language_folder
-        cmd = ["du","-b",f"./{src_filename}.dmp",]
+
+        # command to analyze the file size
+        cmd = ["du","-b",f"./{src_filename}",]
+
+        # strip the file
+        self.platform.comm.shell(f"strip -s ./{src_filename}",current_dir=lg_bench_dir)
+
+        # added command to get the object dump for debugging
+        # self.platform.comm.shell(f'objdump -d ./{src_filename} > ./{src_filename}.dmp',shell = True,current_dir=lg_bench_dir)
+
 
         environment = self._preload_env(**kwargs)
         wrapped_run_command, wrapped_environment = self._wrap_command(
@@ -132,6 +141,7 @@ class SizeBench(Benchmark):
             environment=environment,
             **kwargs,
         )
+
         output = self.run_bench_command(
             run_command=cmd,
             wrapped_run_command=wrapped_run_command,
@@ -140,11 +150,6 @@ class SizeBench(Benchmark):
             wrapped_environment=wrapped_environment,
             print_output=False,
         )
-
-        # generate files to compare sizes
-        self.platform.comm.shell(f'objdump -d ./{src_filename} > ./{src_filename}.dmp',shell = True,current_dir=lg_bench_dir)
-        self.platform.comm.shell(f"sed 's/[<].*$//' ./{src_filename}.dmp > ./{src_filename}.clr",shell = True,current_dir=lg_bench_dir)
-
 
         return output
 
