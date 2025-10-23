@@ -76,9 +76,6 @@ int main(int argc, char *argv[]) {
 
     int64_t t1 = now_us();
 
-    // NOTE: This loop mirrors your C++ exactly:
-    // c.st(m,k, a.gt(m,k) * b.gt(k,n) + c.gt(m,n));
-    // (Yes, indices are "unusual" for standard matmul, but kept identical.)
     for (int m = 0; m < M; m++) {
         for (int n = 0; n < N; n++) {
             for (int k = 0; k < K; k++) {
@@ -92,8 +89,9 @@ int main(int argc, char *argv[]) {
 
     int64_t t2 = now_us();
 
-    // Keep a value to prevent over-optimization and mirror the C++ output
-    printf("%d\n", matrix_gt(&c, M - 1, K - 1));
+    // printing the corner element of the matrix
+    // done so the compiler wont remove the workload
+    printf("checkvalue: %d\n", matrix_gt(&c, M - 1, K - 1));
     printf("runtime: %lld µs\n", (long long)(t2 - t1));
 
     matrix_free(&a);

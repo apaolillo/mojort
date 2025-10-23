@@ -77,7 +77,9 @@ int main(int argc, char *argv[]) {
 
     int64_t t2 = now_us();
 
-    printf("%lld\n", a);                       // prevent over-optimization
+    // printing "a" the sum of all element in the mandelbrot matrix
+    // done so the compiler wont remove the workload
+    printf("checkvalue: %lld\n", a);
     printf("runtime: %lld µs\n", (long long)(t2 - t1));
 
     return 0;

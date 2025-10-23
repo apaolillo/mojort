@@ -40,7 +40,8 @@ def main():
                 c.st(m,n,a.gt(m,k)*b.gt(k,n)+c.gt(m,n))
     var t2 = time.monotonic() / 1000
     var diff = (t2 -t1)
-    # printing otherwise the compiler will optimize the loop away
+    # printing the corner element of the matrix
+    # done so the compiler wont remove the workload
     var check = c.gt(M-1,N-1)
     print(String("checkvalue: {}").format(String(check)))
     print(String("runtime: {} µs").format(String(diff)))

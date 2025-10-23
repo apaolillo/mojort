@@ -51,8 +51,6 @@ fn main() {
 
     let t0 = Instant::now();
 
-    // Mirrors exactly:
-    // c.st(m,k, a.gt(m,k) * b.gt(k,n) + c.gt(m,n));
     for mi in 0..m {
         for ni in 0..n {
             for ki in 0..k {
@@ -62,9 +60,10 @@ fn main() {
         }
     }
 
-    println!("out");
-
     let us = t0.elapsed().as_micros();
-    println!("{}", c.gt(m - 1, k - 1));
+
+    // printing the corner element of the matrix
+    // done so the compiler wont remove the workload
+    println!("checkvalue: {}", c.gt(m - 1, k - 1));
     println!("runtime: {} µs", us);
 }

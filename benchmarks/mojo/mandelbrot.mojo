@@ -50,6 +50,8 @@ def main():
           # a =  a + mandelbrot_split(cx,cy)
   var t2 = time.monotonic() / 1000
   var diff = (t2 -t1)
-  # printing a otherwise the compiler will optimize the loop away
-  print(a)
+  # printing "a" the sum of all element in the mandelbrot matrix
+  # done so the compiler wont remove the workload
+
+  print(String("checkvalue: {}").format(String(a)))
   print(String("runtime: {} µs").format(String(diff)))

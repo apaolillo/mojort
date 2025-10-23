@@ -31,7 +31,6 @@ def KMP(pattern:String,text:String) -> List[Int]:
     var j = 0
 
     while (i<n):
-        # print(i)
         if (pattern[j] == text[i]):
             i += 1
             j += 1
@@ -62,6 +61,8 @@ def main():
     var l = KMP('God',bible)
     var t2 = time.monotonic() / 1000
     var diff = (t2 -t1)
-    # printing a otherwise the compiler will optimize the loop away
-    print(l[len(l)-1])
+    # printing the index of the last found match
+    # done so the compiler wont remove the workload
+    var check = l[len(l)-1]
+    print(String("checkvalue: {}").format(String(check)))
     print(String("runtime: {} µs").format(String(diff)))

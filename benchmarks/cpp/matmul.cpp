@@ -56,8 +56,10 @@ int main(int argc, char *argv[]) {
 
     /* Getting number of milliseconds as a double. */
     duration<double, std::milli> ms_double = t2 - t1;
-    // printing a otherwise the compiler will optimize the loop away
-    std::cout << c.gt(M-1,K-1) << '\n';
+
+    // printing the corner element of the matrix
+    // done so the compiler wont remove the workload
+    std::cout << "checkvalue: " << c.gt(M-1,K-1) << '\n';
     std::cout << "runtime: " << int((ms_double.count() * 1000)) << " µs\n";
     return 0;
 }

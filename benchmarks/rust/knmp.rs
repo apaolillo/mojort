@@ -89,13 +89,8 @@ fn main() {
     let ans = kmp(pattern.as_bytes(), text.as_bytes());
     let duration = t1.elapsed();
 
-    // printing a otherwise the compiler will optimize the loop away
-    println!("{}", ans[ans.len() - 1]);
+    // printing the index of the last found match
+    // done so the compiler wont remove the workload
+    println!("checkvalue: {}", ans[ans.len() - 1]);
     println!("runtime: {} µs", duration.as_micros());
-
-    // return 0;
-    //cout << "Pattern Found at Indexes: ";
-    //for (auto i : ans)
-    //    cout << i << " ";
-    //return 0;
 }

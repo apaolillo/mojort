@@ -82,18 +82,12 @@ int main(int argc, char *argv[]) {
     clock_t end = clock();
 
     if (matchCount > 0)
-        printf("%d\n", ans[matchCount - 1]);
+        // printing the index of the last found match
+        // done so the compiler wont remove the workload
+        printf("checkvalue: %d\n", ans[matchCount - 1]);
 
     double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
     printf("runtime: %d µs\n", (int)(time_taken * 1e6));
-
-    // Optional: Print all match indices
-    /*
-    printf("Pattern Found at Indexes: ");
-    for (int i = 0; i < matchCount; i++)
-        printf("%d ", ans[i]);
-    printf("\n");
-    */
 
     free(ans);
     free(text);

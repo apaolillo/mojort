@@ -46,6 +46,9 @@ fn main() {
     }
 
     let us = t0.elapsed().as_micros();
-    println!("{}", a);
+
+    // printing "a" the sum of all element in the mandelbrot matrix
+    // done so the compiler wont remove the workload
+    println!("checkvalue: {}", a);
     println!("runtime: {} µs", us);
 }
