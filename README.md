@@ -3,7 +3,7 @@
 ## Downloading the project
 
 ```bash
-git clone git@gitlab.soft.vub.ac.be:perfsys/papers/mojort.git
+git clone git@github.com:apaolillo/mojort.git
 cd mojort/
 git submodule update --init --recursive
 ```
