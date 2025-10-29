@@ -5,13 +5,12 @@ const LIMIT: i32 = 1000;
 
 use num_complex::{Complex64, ComplexFloat};
 
-fn mandelbrotComplex(c: Complex64) -> usize {
+fn mandelbrotComplex(c: Complex64) -> i32 {
 
-    const LIMIT:usize = 1000;
     let mut z: Complex64 = c;
 
     for i in 0..LIMIT {
-        if c.abs() > 2.0f64 {
+        if z.abs() > 2.0f64 {
             return i;
         }
 
@@ -33,7 +32,7 @@ fn mandelbrot_split(real: f64, imag: f64) -> i32 {
         zi = 2.0 * zr * zi + imag;
         zr = r2 - i2 + real;
     }
-    LIMIT
+    return LIMIT
 }
 
 fn main() {

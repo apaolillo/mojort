@@ -38,10 +38,10 @@ class MandelbrotBench(Benchmark):
         language_folder = rust_add_build_path(language,src_filename,language_folder)
 
         lg_bench_dir = self._benchmark_dir / language_folder
-        # if not self.platform.comm.isdir(path=lg_bench_dir):
-        #     raise ValueError(
-        #         f"Language '{language_folder}' not found as '{lg_bench_dir}' is not a directory"
-        #     )
+        if not self.platform.comm.isdir(path=lg_bench_dir):
+            raise ValueError(
+                f"Language '{language_folder}' not found as '{lg_bench_dir}' is not a directory"
+            )
 
         cmd = language2cmdline(language=language, src_filename=src_filename)
 
