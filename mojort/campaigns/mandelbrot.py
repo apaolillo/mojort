@@ -15,20 +15,20 @@ def main() -> None:
     campaign = CampaignCartesianProduct(
         name="01_latency",
         benchmark=MandelbrotBench([],platform=platform),
-        nb_runs=20,
+        nb_runs=2,
         variables={
             "size": [128, 512],
             "language": [
                 # --- C++ GCC
-                "cpp-gcc", "cpp-gcc -O1", "cpp-gcc -O2", "cpp-gcc -O3",
+                # "cpp-gcc", "cpp-gcc -O1", "cpp-gcc -O2", "cpp-gcc -O3",
                 # --- C++ Clang
-                "cpp-clang", "cpp-clang -O1", "cpp-clang -O2", "cpp-clang -O3",
+                # "cpp-clang", "cpp-clang -O1", "cpp-clang -O2", "cpp-clang -O3",
                 #"cpp -Ofast",
 
                 # --- C GCC
-                "c-gcc", "c-gcc -O1", "c-gcc -O2", "c-gcc -O3",
+                # "c-gcc", "c-gcc -O1", "c-gcc -O2", "c-gcc -O3",
                 # --- C Clang
-                "c-clang", "c-clang -O1", "c-clang -O2", "c-clang -O3",
+                # "c-clang", "c-clang -O1", "c-clang -O2", "c-clang -O3",
 
                 # --- Rust
                 "rust", "rust -O1", "rust -O2", "rust -O3",

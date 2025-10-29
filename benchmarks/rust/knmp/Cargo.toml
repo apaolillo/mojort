@@ -1,0 +1,22 @@
+[package]
+name = "knmp"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+[profile.a]
+inherits = "release"
+opt-level=0
+
+[profile.b]
+inherits = "release"
+opt-level=1
+
+[profile.c]
+inherits = "release"
+opt-level=2
+
+[profile.d]
+inherits = "release"
+opt-level=3

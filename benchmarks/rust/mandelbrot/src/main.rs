@@ -3,6 +3,24 @@ use std::time::Instant;
 
 const LIMIT: i32 = 1000;
 
+use num_complex::{Complex64, ComplexFloat};
+
+fn mandelbrotComplex(c: Complex64) -> usize {
+
+    const LIMIT:usize = 1000;
+    let mut z: Complex64 = c;
+
+    for i in 0..LIMIT {
+        if c.abs() > 2.0f64 {
+            return i;
+        }
+
+        z = z * z + c;
+    }
+
+    return LIMIT;
+}
+
 #[inline]
 fn mandelbrot_split(real: f64, imag: f64) -> i32 {
     let (mut zr, mut zi) = (real, imag);
@@ -41,7 +59,8 @@ fn main() {
         for j in 0..width {
             let x = x_start + (j as f64) * dx; // real
             let y = y_fin - (i as f64) * dy;   // imag
-            a += mandelbrot_split(x, y) as i64;
+            a += mandelbrotComplex(Complex64::new(x, y)) as i64;
+            // a += mandelbrot_split(x, y) as i64;
         }
     }
 

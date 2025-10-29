@@ -11,7 +11,7 @@ from benchkit.commandwrappers.taskset import TasksetWrap
 from benchkit.benchmark import CommandWrapper
 
 
-nb_runs = 10
+nb_runs = 2
 master_thread_core = [11]
 languages = [
     # --- C++ GCC

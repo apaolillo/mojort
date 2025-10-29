@@ -1,4 +1,5 @@
 
+from pathlib import Path
 import subprocess
 
 
@@ -67,13 +68,13 @@ def language2cmdline(
 
         # --- Rust
         case "rust -O3":
-            cmd = f"rustc -C opt-level=3 {src_filename}.rs -o {src_filename}"
+            cmd = f"cargo build --profile d"
         case "rust -O2":
-            cmd = f"rustc -C opt-level=2 {src_filename}.rs -o {src_filename}"
+            cmd = f"cargo build --profile c"
         case "rust -O1":
-            cmd = f"rustc -C opt-level=1 {src_filename}.rs -o {src_filename}"
+            cmd = f"cargo build --profile b"
         case "rust":
-            cmd = f"rustc {src_filename}.rs -o {src_filename}"
+            cmd = f"cargo build --profile a"
 
         # --- Mojo
         case "mojo":
@@ -97,3 +98,44 @@ def stress_prerun_hook(
         record_data_dir,
     ) -> None:
      subprocess.Popen("stress-ng --cpu 0 --cpu-method all -t 65", shell=True,stdout=None,stderr=None)
+
+
+def rust_add_executable_path(
+    language: str,
+    filename:str,
+    path: Path,
+) -> Path:
+
+    match language:
+
+        # --- Rust
+        case "rust -O3":
+            path = path / Path(f"{filename}/target/d/")
+        case "rust -O2":
+            path = path / Path(f"{filename}/target/c/")
+        case "rust -O1":
+            path = path / Path(f"{filename}/target/b/")
+        case "rust":
+            path = path / Path(f"{filename}/target/a/")
+
+    return path
+
+def rust_add_build_path(
+    language: str,
+    filename:str,
+    path: Path,
+) -> Path:
+
+    match language:
+
+        # --- Rust
+        case "rust -O3":
+            path = path / Path(f"{filename}/")
+        case "rust -O2":
+            path = path / Path(f"{filename}/")
+        case "rust -O1":
+            path = path / Path(f"{filename}/")
+        case "rust":
+            path = path / Path(f"{filename}/")
+
+    return path
