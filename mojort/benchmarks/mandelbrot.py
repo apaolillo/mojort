@@ -3,10 +3,9 @@ from benchkit.platforms import Platform
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
 from pathlib import Path
-from mojort.utils import language2foldername, language2cmdline
+from mojort.utils import language2foldername, language2cmdline, rust_add_build_path, rust_add_executable_path
 from typing import Any, Dict, List, Iterable
 import re
-
 
 class MandelbrotBench(Benchmark):
     def __init__(
@@ -36,6 +35,7 @@ class MandelbrotBench(Benchmark):
         **kwargs,
     ) -> None:
         language_folder = language2foldername(language)
+        language_folder = rust_add_build_path(language,src_filename,language_folder)
 
         lg_bench_dir = self._benchmark_dir / language_folder
         if not self.platform.comm.isdir(path=lg_bench_dir):
@@ -51,6 +51,9 @@ class MandelbrotBench(Benchmark):
             output_is_log=True,
         )
 
+
+
+
     def single_run(
         self,
         build_variables: Dict[str, Any],
@@ -62,6 +65,7 @@ class MandelbrotBench(Benchmark):
 
         src_filename: str = build_variables["src_filename"]
         lg_bench_dir = self._benchmark_dir / language_folder
+        lg_bench_dir = rust_add_executable_path(language,src_filename,lg_bench_dir)
         cmd = [f"./{src_filename}",f'{size}']
 
         environment = self._preload_env(**kwargs)

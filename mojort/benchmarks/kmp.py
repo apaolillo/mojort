@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Iterable
-from mojort.utils import language2cmdline, language2foldername
+from mojort.utils import language2cmdline, language2foldername, rust_add_build_path, rust_add_executable_path
 from benchkit.benchmark import Benchmark, RecordResult, CommandWrapper
 from benchkit.platforms import Platform
 from benchkit.utils.dir import gitmainrootdir
@@ -36,6 +36,7 @@ class KmpBench(Benchmark):
         **kwargs,
     ) -> None:
         language_folder = language2foldername(language)
+        language_folder = rust_add_build_path(language,src_filename,language_folder)
 
         lg_bench_dir = self._benchmark_dir / language_folder
         if not self.platform.comm.isdir(path=lg_bench_dir):
@@ -63,6 +64,7 @@ class KmpBench(Benchmark):
 
         src_filename: str = build_variables["src_filename"]
         lg_bench_dir = self._benchmark_dir / language_folder
+        lg_bench_dir = rust_add_executable_path(language,src_filename,lg_bench_dir)
         cmd = [f"./{src_filename}",f"{size}"]
 
         environment = self._preload_env(**kwargs)
