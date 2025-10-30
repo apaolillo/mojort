@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
     }
 
     int width = atoi(argv[1]);
-    int heigth = width; // keep original variable name from C++ code
+    int height = width; // keep original variable name from C++ code
 
     double x_start = -2.0;
     double x_fin   =  0.47;
@@ -60,12 +60,12 @@ int main(int argc, char *argv[]) {
     double y_fin   =  1.12;
 
     double dx = (x_fin - x_start) / (width  - 1);
-    double dy = (y_fin - y_start) / (heigth - 1);
+    double dy = (y_fin - y_start) / (height - 1);
 
     int64_t t1 = now_us();
     long long a = 0;
 
-    for (int i = 0; i < heigth; i++) {
+    for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             double x = x_start + j * dx;   // current real value
             double y = y_fin   - i * dy;   // current imaginary value
