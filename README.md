@@ -3,7 +3,7 @@
 ## Package dependencies
 
 We support running experiments on Ubuntu 24.04.
-They depend on dependencies, as well as specific kernel images:
+They depend on package dependencies, as well as specific kernel images:
 
 ```bash
 sudo apt update
