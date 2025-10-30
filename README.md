@@ -1,11 +1,28 @@
 # mojort
 
+## Package dependencies
+
+We support running experiments on Ubuntu 24.04.
+They depend on dependencies, as well as specific kernel images:
+
+```bash
+sudo apt update
+sudo apt install -y git stress-ng python3 python3-venv curl
+sudo apt install -y linux-image-6.14.0-34-generic linux-image-6.8.1-1015-realtime linux-image-6.8.0-87-generic
+```
+
 ## Downloading the project
 
 ```bash
 git clone git@github.com:apaolillo/mojort.git
 cd mojort/
 git submodule update --init --recursive
+```
+
+If SSH is not configured on your system, update the submodules as follows:
+
+```bash
+git -c url."https://github.com/".insteadOf=git@github.com: -c url."https://".insteadOf=git:// submodule update --init --recursive
 ```
 
 ## Setting up the environment
@@ -15,14 +32,7 @@ git submodule update --init --recursive
 . ./.venv/bin/activate
 ```
 
-## Requirements
-
-### stress-ng
-
-The cyclictest requires stress-ng to be installed on the host system.
-On ubuntu ths can be installed using `sudo apt install stress-ng`
-
-### Docker
+## Docker
 
 ```bash
 curl -fsSL https://get.docker.com -o get-docker.sh
@@ -31,7 +41,7 @@ sudo usermod -aG docker $USER
 # Reboot
 ```
 
-### Install the NVIDIA Container Toolkit
+## Install the NVIDIA Container Toolkit
 
 See instructions on [NVIDIA's website](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
 
@@ -40,18 +50,21 @@ See instructions on [NVIDIA's website](https://docs.nvidia.com/datacenter/cloud-
 
 ### Starting the docker container
 
+Build the docker image and run the container:
 ```bash
 ./rundocker.py
 ```
-This may take A while to setup
 
-### Seting up the environment inside of the docker container
+This takes a while the first time before the docker image is saved in the
+docker cache. The subsequent runs should be fast.
+
+To set the "Mojo venv" inside the docker container:
 
 ```bash
 . ~/.mojort/.venv/bin/activate
 ```
 
-### Example of building and running a Mojo file
+You may try building and running a Mojo example file:
 
 ```bash
 cd ~/workspace/mojort/benchmarks/mojo/
@@ -59,11 +72,10 @@ mojo build loop_constant.mojo -o loop_constant
 ./loop_constant
 ```
 
-## Run benchmarks
+## Run the benchmarks
 
-The benchmarks wil automaticaly make use of the docker container that
-was described in the previous steps.
-Run the following commands outside of the docker container.
+The benchmarks will automatically use the docker image built above.
+Run the following commands outside the docker container.
 
 ### Microbenchmarks
 
