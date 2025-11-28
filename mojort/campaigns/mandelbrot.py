@@ -5,7 +5,7 @@ from mojort.platforms import get_mojort_docker_platform_from
 from mojort.runners import get_mojort_runner, get_mojort_builder
 import pandas as pd
 from benchkit.campaign import CampaignCartesianProduct
-from mojort.benchmarks.mandelbrot import MandelbrotBench
+from mojort.benchmarks.microbench import MicrobenchBench
 
 
 def main() -> None:
@@ -14,7 +14,7 @@ def main() -> None:
     platform = get_mojort_docker_platform_from(runner=runner)
     campaign = CampaignCartesianProduct(
         name="01_latency",
-        benchmark=MandelbrotBench([],platform=platform),
+        benchmark=MicrobenchBench([],platform=platform),
         nb_runs=20,
         variables={
             "size": [128, 512],

@@ -4,7 +4,7 @@ import numpy as np
 from mojort.platforms import get_mojort_docker_platform_from
 from mojort.runners import get_mojort_runner
 from benchkit.campaign import CampaignCartesianProduct
-from mojort.benchmarks.kmp import KmpBench
+from mojort.benchmarks.microbench import MicrobenchBench
 
 
 def main() -> None:
@@ -12,7 +12,7 @@ def main() -> None:
     platform = get_mojort_docker_platform_from(runner=runner)
     campaign = CampaignCartesianProduct(
         name="knmp",
-        benchmark=KmpBench([],platform=platform),
+        benchmark=MicrobenchBench([],platform=platform),
         nb_runs=2,
         variables={
             "language": [

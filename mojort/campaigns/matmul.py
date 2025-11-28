@@ -3,7 +3,7 @@
 from mojort.platforms import get_mojort_docker_platform_from
 from mojort.runners import get_mojort_runner, get_mojort_builder
 from benchkit.campaign import CampaignCartesianProduct
-from mojort.benchmarks.matmul import MatmulBench
+from mojort.benchmarks.microbench import MicrobenchBench
 
 
 def main() -> None:
@@ -12,7 +12,7 @@ def main() -> None:
     platform = get_mojort_docker_platform_from(runner=runner)
     campaign = CampaignCartesianProduct(
         name="matmul",
-        benchmark=MatmulBench([],platform=platform),
+        benchmark=MicrobenchBench([],platform=platform),
         nb_runs=20,
         variables={
             "size": [16, 32],
