@@ -3,7 +3,7 @@ from benchkit.platforms import Platform
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
 from pathlib import Path
-from mojort.utils import language2foldername, language2cmdline, rust_add_build_path, rust_add_executable_path
+from mojort.utils import language2foldername, language2cmdline, rust_add_executable_path
 from typing import Any, Dict, List, Iterable
 import re
 
@@ -36,7 +36,8 @@ class MicrobenchBench(Benchmark):
         **kwargs,
     ) -> None:
         language_folder = language2foldername(language)
-        language_folder = rust_add_build_path(language, src_filename, language_folder)
+        if language.startswith("rust"):
+            language_folder = Path(language_folder) / src_filename
 
         lg_bench_dir = self._benchmark_dir / language_folder
         if not self.platform.comm.isdir(path=lg_bench_dir):
