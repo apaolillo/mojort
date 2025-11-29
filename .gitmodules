@@ -5,5 +5,5 @@
 	path = deps/pythainer
 	url = git@github.com:apaolillo/pythainer.git
 [submodule "benchmarks/rt-tests"]
-	path = benchmarks/rt-tests
+	path = deps/rt-tests
 	url = git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
