@@ -1,5 +1,4 @@
 import re
-import subprocess
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
@@ -8,7 +7,7 @@ from benchkit.platforms import Platform
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
 
-from mojort.utils import language2cmdline, language2foldername, rust_add_build_path
+from mojort.utils import language2foldername
 
 
 class SizeBench(Benchmark):
@@ -39,7 +38,8 @@ class SizeBench(Benchmark):
         **kwargs,
     ) -> None:
         language_folder = language2foldername(language)
-        language_folder = rust_add_build_path(language, src_filename, language_folder)
+        if language.startswith("rust"):
+            language_folder = Path(language_folder) / src_filename
 
         lg_bench_dir = self._benchmark_dir / language_folder
         if not self.platform.comm.isdir(path=lg_bench_dir):
@@ -132,17 +132,22 @@ class SizeBench(Benchmark):
         language_folder = language2foldername(language)
 
         src_filename: str = build_variables["src_filename"]
-        lg_bench_dir = self._benchmark_dir / language_folder
-        lg_bench_dir = rust_add_build_path(language, src_filename, lg_bench_dir)
+        lg_bench_dir = language2foldername(language)
+        if language.startswith("rust"):
+            lg_bench_dir = Path(language_folder) / src_filename
 
-        # command to analyze the file size
+        # Command to analyze the file size
         cmd = ["du", "-b", f"./{src_filename}.o"]
 
-        # strip the file
+        # Strip the file
         self.platform.comm.shell(f"strip -s ./{src_filename}.o", current_dir=lg_bench_dir)
 
-        # added command to get the object dump for debugging
-        # self.platform.comm.shell(f'objdump -d ./{src_filename} > ./{src_filename}.dmp',shell = True,current_dir=lg_bench_dir)
+        # Command to get the object dump for debugging
+        self.platform.comm.shell(
+            command=f"objdump -d ./{src_filename} > ./{src_filename}.dmp",
+            shell=True,
+            current_dir=lg_bench_dir,
+        )
 
         environment = self._preload_env(**kwargs)
         wrapped_run_command, wrapped_environment = self._wrap_command(

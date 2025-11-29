@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import numpy as np
 from benchkit.campaign import CampaignCartesianProduct
 
 from mojort.benchmarks.size import SizeBench

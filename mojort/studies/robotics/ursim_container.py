@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from pythainer.builders import DockerBuilder
 from pythainer.runners import ConcreteDockerRunner
 
 

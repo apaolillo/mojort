@@ -62,8 +62,8 @@ def main() -> None:
     )
     campaign.run()
 
-    # NOTE: there are mistakes made by one of the langaues as both do not produce the exact same output
-    # this might be worth mentioning in the paper
+    # NOTE: there are errors made by one of the languages as both do not produce
+    # the exact same output. This might be worth mentioning in the paper.
 
     """
     def test(dataframe):

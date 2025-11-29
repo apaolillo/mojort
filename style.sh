@@ -8,4 +8,4 @@ black="${venv}/black"
 
 ${isort} --profile=black mojort/ notebooks/
 ${black} .
-#${flake8} --profile=black mojort/ notebooks/
+${flake8} mojort/ notebooks/
