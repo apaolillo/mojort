@@ -59,7 +59,7 @@ class MatmulGpu(Benchmark):
 
         src_filename: str = build_variables["src_filename"]
         lg_bench_dir = self._benchmark_dir / language_folder
-        cmd = [f"./{src_filename}",f'{size}']
+        cmd = [f"./{src_filename}", f"{size}"]
 
         output = self.platform.comm.shell(command=cmd, current_dir=lg_bench_dir)
 
@@ -90,6 +90,4 @@ class MatmulGpu(Benchmark):
         ]
 
     def get_run_var_names(self) -> List[str]:
-        return [
-            "size"
-        ]
+        return ["size"]

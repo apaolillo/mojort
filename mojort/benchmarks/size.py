@@ -37,7 +37,7 @@ class SizeBench(Benchmark):
         **kwargs,
     ) -> None:
         language_folder = language2foldername(language)
-        language_folder = rust_add_build_path(language,src_filename,language_folder)
+        language_folder = rust_add_build_path(language, src_filename, language_folder)
 
         lg_bench_dir = self._benchmark_dir / language_folder
         if not self.platform.comm.isdir(path=lg_bench_dir):
@@ -81,11 +81,17 @@ class SizeBench(Benchmark):
 
             # --- C Clang
             case "c-clang -O3":
-                cmd = f"clang -O3 -std=c11 -D_GNU_SOURCE {src_filename}.c -c -lm -o {src_filename}.o"
+                cmd = (
+                    f"clang -O3 -std=c11 -D_GNU_SOURCE {src_filename}.c -c -lm -o {src_filename}.o"
+                )
             case "c-clang -O2":
-                cmd = f"clang -O2 -std=c11 -D_GNU_SOURCE {src_filename}.c -c -lm -o {src_filename}.o"
+                cmd = (
+                    f"clang -O2 -std=c11 -D_GNU_SOURCE {src_filename}.c -c -lm -o {src_filename}.o"
+                )
             case "c-clang -O1":
-                cmd = f"clang -O1 -std=c11 -D_GNU_SOURCE {src_filename}.c -c -lm -o {src_filename}.o"
+                cmd = (
+                    f"clang -O1 -std=c11 -D_GNU_SOURCE {src_filename}.c -c -lm -o {src_filename}.o"
+                )
             case "c-clang":
                 cmd = f"clang -std=c11 -D_GNU_SOURCE {src_filename}.c -lm -c -o {src_filename}.o"
 
@@ -125,17 +131,16 @@ class SizeBench(Benchmark):
 
         src_filename: str = build_variables["src_filename"]
         lg_bench_dir = self._benchmark_dir / language_folder
-        lg_bench_dir = rust_add_build_path(language,src_filename,lg_bench_dir)
+        lg_bench_dir = rust_add_build_path(language, src_filename, lg_bench_dir)
 
         # command to analyze the file size
-        cmd = ["du","-b",f"./{src_filename}.o",]
+        cmd = ["du", "-b", f"./{src_filename}.o"]
 
         # strip the file
-        self.platform.comm.shell(f"strip -s ./{src_filename}.o",current_dir=lg_bench_dir)
+        self.platform.comm.shell(f"strip -s ./{src_filename}.o", current_dir=lg_bench_dir)
 
         # added command to get the object dump for debugging
         # self.platform.comm.shell(f'objdump -d ./{src_filename} > ./{src_filename}.dmp',shell = True,current_dir=lg_bench_dir)
-
 
         environment = self._preload_env(**kwargs)
         wrapped_run_command, wrapped_environment = self._wrap_command(

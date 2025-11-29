@@ -28,10 +28,11 @@ SAMPLESIZE = 100_000
 DATASETREDUCTION = 0.95
 
 
-
 class ProgramCompareBench(Benchmark):
-    def __init__(self, platform: Platform,
-        duration = 60,
+    def __init__(
+        self,
+        platform: Platform,
+        duration=60,
         buckets=42,
         percentile=0.95,
     ):
@@ -103,7 +104,17 @@ class ProgramCompareBench(Benchmark):
         match language:
             case "c":
                 cmd = ["sudo", f"./{src_filename}"]
-                cmd += ["--nsecs", "-vn", "-i","100", "-p","99", "-t", f"{threads}", "--duration=1m"]
+                cmd += [
+                    "--nsecs",
+                    "-vn",
+                    "-i",
+                    "100",
+                    "-p",
+                    "99",
+                    "-t",
+                    f"{threads}",
+                    "--duration=1m",
+                ]
                 if lock_memory_alloc:
                     cmd += ["--mlockall"]
             case "mojo":
@@ -113,7 +124,7 @@ class ProgramCompareBench(Benchmark):
 
             case _:
                 raise ValueError(f"Unknown language '{language}'")
-        output = self.platform.comm.shell(command=cmd, current_dir=lg_bench_dir,print_output = False)
+        output = self.platform.comm.shell(command=cmd, current_dir=lg_bench_dir, print_output=False)
 
         return output
 
@@ -131,24 +142,28 @@ class ProgramCompareBench(Benchmark):
 
         # data fields
         # threadnumber - iteration counter - latency
-        latency = [float(x[2]) for x in re.findall(r"\s*([\d.]+):\s*([\d.]+):\s*([\d.]+)\s*", command_output)]
+        latency = [
+            float(x[2])
+            for x in re.findall(r"\s*([\d.]+):\s*([\d.]+):\s*([\d.]+)\s*", command_output)
+        ]
         nl = latency
 
         # sort and remove top part for outliers
         nl.sort()
         leng = len(nl)
-        reduced = nl[:int(leng*DATASETREDUCTION)]
+        reduced = nl[: int(leng * DATASETREDUCTION)]
 
         # sample the result such that the plotting can keep up
-        sampled = random.sample(reduced,SAMPLESIZE)
+        sampled = random.sample(reduced, SAMPLESIZE)
 
-        # save data in seperate file
-        complete_name = os.path.join(record_data_dir, build_variables["language"]+str(run_variables['threads'])+".txt")
-        with open(complete_name,"w+") as f:
+        # save data in a separate file
+        filename = build_variables["language"] + str(run_variables["threads"]) + ".txt"
+        complete_name = record_data_dir / filename
+        with open(complete_name, "w+") as f:
             for x in sampled:
-                f.write(f'{str(x)}\n')
+                f.write(f"{str(x)}\n")
         result = {
-            'datapath':complete_name,
+            "datapath": complete_name,
         }
 
         return result
@@ -181,7 +196,7 @@ def main() -> None:
                 "c",
             ],
             "src_filename": ["cyclictest"],
-            "threads":[1,2,3,4,],
+            "threads": [1, 2, 3, 4],
             "lock_memory_alloc": [
                 # False,
                 True,
@@ -225,7 +240,7 @@ def main() -> None:
         split=True,
         inner="quart",
         height=8.27,
-        aspect=15/8.27,
+        aspect=15 / 8.27,
     )
 
 

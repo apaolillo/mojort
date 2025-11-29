@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import subprocess
 
@@ -16,6 +15,7 @@ def language2foldername(language: str) -> str:
     else:
         language_folder = language
     return language_folder
+
 
 def language2cmdline(
     language: str,
@@ -91,18 +91,25 @@ def language2cmdline(
 
     return cmd
 
+
 def stress_prerun_hook(
-        build_variables,
-        run_variables,
-        other_variables,
-        record_data_dir,
-    ) -> None:
-     subprocess.Popen("stress-ng --cpu 0 --cpu-method all -t 65", shell=True,stdout=None,stderr=None)
+    build_variables,
+    run_variables,
+    other_variables,
+    record_data_dir,
+) -> None:
+    # TODO use benchkit internal primitives
+    subprocess.Popen(
+        "stress-ng --cpu 0 --cpu-method all -t 65",
+        shell=True,
+        stdout=None,
+        stderr=None,
+    )
 
 
 def rust_add_executable_path(
     language: str,
-    filename:str,
+    filename: str,
     path: Path,
 ) -> Path:
 
