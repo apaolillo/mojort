@@ -7,7 +7,11 @@ from benchkit.platforms import Platform
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
 
-from mojort.utils import language2cmdline, language2foldername, rust_add_executable_path
+from mojort.utils import (
+    get_build_command,
+    language2foldername,
+    rust_add_executable_path,
+)
 
 
 class MicrobenchBench(Benchmark):
@@ -34,9 +38,12 @@ class MicrobenchBench(Benchmark):
     def build_bench(
         self,
         language: str,
+        opt_level: str,
         src_filename: str,
         **kwargs,
     ) -> None:
+        cmd = get_build_command(language=language, opt_level=opt_level, src_filename=src_filename)
+
         language_folder = Path(language2foldername(language))
         if language.startswith("rust"):
             language_folder = language_folder / src_filename
@@ -46,8 +53,6 @@ class MicrobenchBench(Benchmark):
             raise ValueError(
                 f"Language '{language_folder}' not found as '{lg_bench_dir}' is not a directory"
             )
-
-        cmd = language2cmdline(language=language, src_filename=src_filename)
 
         self.platform.comm.shell(
             command=cmd,
@@ -62,11 +67,12 @@ class MicrobenchBench(Benchmark):
         **kwargs,
     ) -> str:
         language: str = build_variables["language"]
-        language_folder = language2foldername(language)
-
+        opt_level: str = build_variables["opt_level"]
         src_filename: str = build_variables["src_filename"]
+
+        language_folder = language2foldername(language)
         lg_bench_dir = self._benchmark_dir / language_folder
-        lg_bench_dir = rust_add_executable_path(language, src_filename, lg_bench_dir)
+        lg_bench_dir = rust_add_executable_path(language, src_filename, lg_bench_dir, opt_level)
         cmd = [f"./{src_filename}", f"{size}"]
 
         environment = self._preload_env(**kwargs)
@@ -106,6 +112,7 @@ class MicrobenchBench(Benchmark):
     def get_build_var_names(self) -> List[str]:
         return [
             "language",
+            "opt_level",
             "src_filename",
         ]
 

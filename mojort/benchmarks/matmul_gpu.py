@@ -7,7 +7,7 @@ from benchkit.platforms import Platform
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
 
-from mojort.utils import language2cmdline, language2foldername
+from mojort.utils import get_build_command, language2foldername
 
 
 class MatmulGpu(Benchmark):
@@ -31,6 +31,7 @@ class MatmulGpu(Benchmark):
         self,
         language: str,
         src_filename: str,
+        opt_level: str = "O0",
         **kwargs,
     ) -> None:
         language_folder = language2foldername(language)
@@ -41,7 +42,7 @@ class MatmulGpu(Benchmark):
                 f"Language '{language_folder}' not found as '{lg_bench_dir}' is not a directory"
             )
 
-        cmd = language2cmdline(language=language, src_filename=src_filename)
+        cmd = get_build_command(language=language, opt_level=opt_level, src_filename=src_filename)
 
         self.platform.comm.shell(
             command=cmd,
