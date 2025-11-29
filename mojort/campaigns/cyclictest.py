@@ -1,21 +1,15 @@
 #!/usr/bin/env python3
 
-import os
 import pathlib
 import random
 import re
 from pathlib import Path
-import subprocess
 from typing import Any, Dict, List
 from mojort.platforms import get_mojort_docker_platform_from
 from mojort.runners import get_mojort_runner, get_mojort_builder
 
 
 import pandas as pd
-from benchkit.platforms import get_current_platform
-from benchkit.hooks.stressNg import StressNgPreHook, StressNgPostHook
-from benchkit.dependencies.packages import PackageDependency
-from benchkit.shell.shell import shell_out
 from benchkit.benchmark import Benchmark, RecordResult
 from benchkit.campaign import CampaignCartesianProduct
 from benchkit.platforms import Platform
@@ -24,11 +18,11 @@ from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
 from mojort.utils import stress_prerun_hook
 
-SAMPLESIZE = 100_000
-DATASETREDUCTION = 0.95
+SAMPLE_SIZE = 100_000
+DATASET_REDUCTION = 0.95
 
 
-class ProgramCompareBench(Benchmark):
+class CyclicTestBench(Benchmark):
     def __init__(
         self,
         platform: Platform,
@@ -44,43 +38,53 @@ class ProgramCompareBench(Benchmark):
             post_run_hooks=[],
         )
         self.platform = platform
-        self._src_path = gitmainrootdir() / "benchmarks"
-        self._benchmark_dir = Path("/home/user/workspace/mojort/benchmarks")
+        gmrd_host = gitmainrootdir()
+        gmrd = self.platform.comm.host_to_comm_path(host_path=gmrd_host)
+        self._src_path = gmrd / "benchmarks"
+        self._rttests_path = gmrd / "deps/rt-tests"
+        self._src_filename = "cyclictest"
 
     @property
-    def bench_src_path(self) -> pathlib.Path:
+    def bench_src_path(self) -> Path:
         return self._src_path
+
+    def _bench_dir(
+        self,
+        language: str,
+    ) -> Path:
+        if "c" == language:
+            bench_dir = self._rttests_path
+        else:
+            bench_dir = self._src_path / language
+
+        if not self.platform.comm.isdir(path=bench_dir):
+            raise ValueError(
+                f"cyclictest not found in language {language}, as '{bench_dir}' is not a directory"
+            )
+
+        return bench_dir
 
     def build_bench(
         self,
         language: str,
-        src_filename: str,
         **kwargs,
     ) -> None:
+        bench_dir = self._bench_dir(language=language)
 
-        if language.startswith("c"):
-            language_folder = "rt-tests"
-        else:
-            language_folder = language
-
-        lg_bench_dir = self._benchmark_dir / language_folder
-        if not self.platform.comm.isdir(path=lg_bench_dir):
-            raise ValueError(
-                f"Language '{language_folder}' not found as '{lg_bench_dir}' is not a directory"
-            )
-
+        cmd = ""
         match language:
             case "mojo":
+                fn = self._src_filename
                 mojo_bin = "/home/user/.mojort/.venv/bin"
-                cmd = f"{mojo_bin}/mojo build -O 0 -o {src_filename} {src_filename}.mojo"
+                cmd = f"{mojo_bin}/mojo build -O 0 -o {fn} {fn}.mojo"
             case "c":
-                cmd = f"make {src_filename}"
+                cmd = f"make {self._src_filename}"
             case _:
                 raise ValueError(f"Unknown language '{language}'")
 
         self.platform.comm.shell(
             command=cmd,
-            current_dir=lg_bench_dir,
+            current_dir=bench_dir,
             output_is_log=True,
         )
 
@@ -92,18 +96,12 @@ class ProgramCompareBench(Benchmark):
         **kwargs,
     ) -> str | AsyncProcess:
         language: str = build_variables["language"]
+        bench_dir = self._bench_dir(language=language)
 
-        if language.startswith("c"):
-            language_folder = "rt-tests"
-        else:
-            language_folder = language
-
-        src_filename: str = build_variables["src_filename"]
-        lg_bench_dir = self._benchmark_dir / language_folder
-
+        cmd = ""
         match language:
             case "c":
-                cmd = ["sudo", f"./{src_filename}"]
+                cmd = ["sudo", f"./{self._src_filename}"]
                 cmd += [
                     "--nsecs",
                     "-vn",
@@ -118,13 +116,13 @@ class ProgramCompareBench(Benchmark):
                 if lock_memory_alloc:
                     cmd += ["--mlockall"]
             case "mojo":
-                cmd = ["sudo", "python3", f"./{src_filename}.py", f"{threads}"]
+                cmd = ["sudo", "python3", f"./{self._src_filename}.py", f"{threads}"]
                 if lock_memory_alloc:
                     cmd += ["--mlockall"]
-
             case _:
                 raise ValueError(f"Unknown language '{language}'")
-        output = self.platform.comm.shell(command=cmd, current_dir=lg_bench_dir, print_output=False)
+
+        output = self.platform.comm.shell(command=cmd, current_dir=bench_dir, print_output=False)
 
         return output
 
@@ -148,22 +146,22 @@ class ProgramCompareBench(Benchmark):
         ]
         nl = latency
 
-        # sort and remove top part for outliers
+        # sort and remove the top part for outliers
         nl.sort()
         leng = len(nl)
-        reduced = nl[: int(leng * DATASETREDUCTION)]
+        reduced = nl[: int(leng * DATASET_REDUCTION)]
 
         # sample the result such that the plotting can keep up
-        sampled = random.sample(reduced, SAMPLESIZE)
+        sampled = random.sample(reduced, SAMPLE_SIZE)
 
         # save data in a separate file
         filename = build_variables["language"] + str(run_variables["threads"]) + ".txt"
-        complete_name = record_data_dir / filename
+        complete_name = Path(record_data_dir) / filename
         with open(complete_name, "w+") as f:
             for x in sampled:
                 f.write(f"{str(x)}\n")
         result = {
-            "datapath": complete_name,
+            "datapath": str(complete_name),
         }
 
         return result
@@ -171,7 +169,6 @@ class ProgramCompareBench(Benchmark):
     def get_build_var_names(self) -> List[str]:
         return [
             "language",
-            "src_filename",
         ]
 
     def get_run_var_names(self) -> List[str]:
@@ -188,14 +185,13 @@ def main() -> None:
     kernel_version = platform.kernel_version()
     campaign = CampaignCartesianProduct(
         name="cyclictest",
-        benchmark=ProgramCompareBench(platform=platform),
+        benchmark=CyclicTestBench(platform=platform),
         nb_runs=1,
         variables={
             "language": [
                 "mojo",
                 "c",
             ],
-            "src_filename": ["cyclictest"],
             "threads": [1, 2, 3, 4],
             "lock_memory_alloc": [
                 # False,
