@@ -4,16 +4,17 @@ import pathlib
 import re
 from pathlib import Path
 from typing import Any, Dict, List
-import numpy as np
-from mojort.platforms import get_mojort_docker_platform_from
-from mojort.runners import get_mojort_runner
 
+import numpy as np
 from benchkit.benchmark import Benchmark, RecordResult
 from benchkit.campaign import CampaignCartesianProduct
 from benchkit.platforms import Platform
 from benchkit.shell.shellasync import AsyncProcess
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
+
+from mojort.platforms import get_mojort_docker_platform_from
+from mojort.runners import get_mojort_runner
 
 
 class ProgramCompareBench(Benchmark):

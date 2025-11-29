@@ -1,12 +1,16 @@
 from pathlib import Path
 
+from benchkit.utils.dir import gitmainrootdir
 from pythainer.builders import PartialDockerBuilder, UbuntuDockerBuilder
-from pythainer.examples.builders import get_user_gui_builder
+from pythainer.examples.builders import (
+    get_user_gui_builder,
+    qemu_builder,
+    qemu_dependencies,
+    rust_builder,
+)
 from pythainer.examples.runners import gpu_runner, gui_runner, personal_runner
 from pythainer.runners import ConcreteDockerRunner
 from pythainer.sysutils import PathType as PythainerPathType
-from pythainer.examples.builders import qemu_builder, qemu_dependencies, rust_builder
-from benchkit.utils.dir import gitmainrootdir
 
 
 def add_toyos(

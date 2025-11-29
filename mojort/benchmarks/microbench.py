@@ -1,11 +1,13 @@
-from benchkit.benchmark import Benchmark, RecordResult, CommandWrapper
+import re
+from pathlib import Path
+from typing import Any, Dict, Iterable, List
+
+from benchkit.benchmark import Benchmark, CommandWrapper, RecordResult
 from benchkit.platforms import Platform
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
-from pathlib import Path
-from mojort.utils import language2foldername, language2cmdline, rust_add_executable_path
-from typing import Any, Dict, List, Iterable
-import re
+
+from mojort.utils import language2cmdline, language2foldername, rust_add_executable_path
 
 
 class MicrobenchBench(Benchmark):

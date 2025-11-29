@@ -5,9 +5,6 @@ import random
 import re
 from pathlib import Path
 from typing import Any, Dict, List
-from mojort.platforms import get_mojort_docker_platform_from
-from mojort.runners import get_mojort_runner, get_mojort_builder
-
 
 import pandas as pd
 from benchkit.benchmark import Benchmark, RecordResult
@@ -16,6 +13,9 @@ from benchkit.platforms import Platform
 from benchkit.shell.shellasync import AsyncProcess
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
+
+from mojort.platforms import get_mojort_docker_platform_from
+from mojort.runners import get_mojort_builder, get_mojort_runner
 from mojort.utils import stress_prerun_hook
 
 SAMPLE_SIZE = 100_000

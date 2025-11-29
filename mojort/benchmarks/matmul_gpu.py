@@ -1,11 +1,13 @@
+import re
+from pathlib import Path
+from typing import Any, Dict, List
+
 from benchkit.benchmark import Benchmark, RecordResult
 from benchkit.platforms import Platform
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
-from mojort.utils import language2foldername, language2cmdline
-from pathlib import Path
-from typing import Any, Dict, List
-import re
+
+from mojort.utils import language2cmdline, language2foldername
 
 
 class MatmulGpu(Benchmark):

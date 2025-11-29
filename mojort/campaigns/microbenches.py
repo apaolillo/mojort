@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-from mojort.platforms import get_mojort_docker_platform_from
-from mojort.runners import get_mojort_runner, get_mojort_builder
-from benchkit.campaign import CampaignCartesianProduct, CampaignSuite
-from mojort.benchmarks.microbench import MicrobenchBench
-from benchkit.platforms import Platform
-from benchkit.commandwrappers.taskset import TasksetWrap
 from benchkit.benchmark import CommandWrapper
+from benchkit.campaign import CampaignCartesianProduct, CampaignSuite
+from benchkit.commandwrappers.taskset import TasksetWrap
+from benchkit.platforms import Platform
 
+from mojort.benchmarks.microbench import MicrobenchBench
+from mojort.platforms import get_mojort_docker_platform_from
+from mojort.runners import get_mojort_builder, get_mojort_runner
 
 nb_runs = 20
 master_thread_core = [11]

@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 import numpy as np
-from mojort.platforms import get_mojort_docker_platform_from
-from mojort.runners import get_mojort_runner, get_mojort_builder
 import pandas as pd
 from benchkit.campaign import CampaignCartesianProduct
+
 from mojort.benchmarks.microbench import MicrobenchBench
+from mojort.platforms import get_mojort_docker_platform_from
+from mojort.runners import get_mojort_builder, get_mojort_runner
 
 
 def main() -> None:
