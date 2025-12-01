@@ -119,23 +119,3 @@ def rust_add_executable_path(
             path = path / Path(f"{filename}/target/a/")
 
     return path
-
-def rust_add_build_path(
-    language: str,
-    filename:str,
-    path: Path,
-) -> Path:
-
-    match language:
-
-        # --- Rust
-        case "rust -O3":
-            path = path / Path(f"{filename}/")
-        case "rust -O2":
-            path = path / Path(f"{filename}/")
-        case "rust -O1":
-            path = path / Path(f"{filename}/")
-        case "rust":
-            path = path / Path(f"{filename}/")
-
-    return path
