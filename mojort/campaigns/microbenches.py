@@ -3,9 +3,7 @@
 from mojort.platforms import get_mojort_docker_platform_from
 from mojort.runners import get_mojort_runner, get_mojort_builder
 from benchkit.campaign import CampaignCartesianProduct, CampaignSuite
-from mojort.benchmarks.mandelbrot import MandelbrotBench
-from mojort.benchmarks.matmul import MatmulBench
-from mojort.benchmarks.kmp import KmpBench
+from mojort.benchmarks.microbench import MicrobenchBench
 from benchkit.platforms import Platform
 from benchkit.commandwrappers.taskset import TasksetWrap
 from benchkit.benchmark import CommandWrapper
@@ -39,7 +37,7 @@ def mandelbrot_campaign(
 ) -> CampaignCartesianProduct:
     return CampaignCartesianProduct(
         name="11_mandelbrot",
-        benchmark=MandelbrotBench(
+        benchmark=MicrobenchBench(
             command_wrappers=wrappers,
             platform=platform,
         ),
@@ -68,7 +66,7 @@ def matmul_campaign(
 ) -> CampaignCartesianProduct:
     return CampaignCartesianProduct(
         name="12_matmul",
-        benchmark=MatmulBench(
+        benchmark=MicrobenchBench(
             command_wrappers=wrappers,
             platform=platform,
         ),
@@ -96,7 +94,7 @@ def kmp_campaign(
 ) -> CampaignCartesianProduct:
     return CampaignCartesianProduct(
         name="13_kmp",
-        benchmark=KmpBench(
+        benchmark=MicrobenchBench(
             command_wrappers=wrappers,
             platform=platform,
         ),

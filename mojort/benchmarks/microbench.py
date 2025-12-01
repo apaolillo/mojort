@@ -1,14 +1,14 @@
-import re
-from pathlib import Path
-from typing import Any, Dict, List, Iterable
-from mojort.utils import language2cmdline, language2foldername, rust_add_build_path, rust_add_executable_path
 from benchkit.benchmark import Benchmark, RecordResult, CommandWrapper
 from benchkit.platforms import Platform
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
+from pathlib import Path
+from mojort.utils import language2foldername, language2cmdline, rust_add_build_path, rust_add_executable_path
+from typing import Any, Dict, List, Iterable
+import re
 
 
-class KmpBench(Benchmark):
+class MicrobenchBench(Benchmark):
     def __init__(
         self,
         command_wrappers: Iterable[CommandWrapper],
@@ -36,7 +36,7 @@ class KmpBench(Benchmark):
         **kwargs,
     ) -> None:
         language_folder = language2foldername(language)
-        language_folder = rust_add_build_path(language,src_filename,language_folder)
+        language_folder = rust_add_build_path(language, src_filename, language_folder)
 
         lg_bench_dir = self._benchmark_dir / language_folder
         if not self.platform.comm.isdir(path=lg_bench_dir):
@@ -58,14 +58,13 @@ class KmpBench(Benchmark):
         size,
         **kwargs,
     ) -> str:
-
         language: str = build_variables["language"]
         language_folder = language2foldername(language)
 
         src_filename: str = build_variables["src_filename"]
         lg_bench_dir = self._benchmark_dir / language_folder
-        lg_bench_dir = rust_add_executable_path(language,src_filename,lg_bench_dir)
-        cmd = [f"./{src_filename}",f"{size}"]
+        lg_bench_dir = rust_add_executable_path(language, src_filename, lg_bench_dir)
+        cmd = [f"./{src_filename}", f'{size}']
 
         environment = self._preload_env(**kwargs)
         wrapped_run_command, wrapped_environment = self._wrap_command(
@@ -93,7 +92,6 @@ class KmpBench(Benchmark):
         record_data_dir: PathType,
         **kwargs,
     ) -> RecordResult:
-
         runtime = [float(m) for m in re.findall(r"runtime: ([\d.]+) µs", command_output)][0]
 
         result = {
@@ -110,6 +108,6 @@ class KmpBench(Benchmark):
 
     def get_run_var_names(self) -> List[str]:
         return [
-            "size",
             "master_thread_core",
+            "size",
         ]
