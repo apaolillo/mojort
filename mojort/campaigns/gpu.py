@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 import numpy as np
-from mojort.platforms import get_mojort_docker_platform_from
-from mojort.runners import get_mojort_runner, get_mojort_builder
-from pythainer.examples.runners import gpu_runner
 from benchkit.campaign import CampaignCartesianProduct
-from mojort.benchmarks.matmul_gpu import MatmulGpu
+from pythainer.examples.runners import gpu_runner
 
+from mojort.benchmarks.matmul_gpu import MatmulGpu
+from mojort.platforms import get_mojort_docker_platform_from
+from mojort.runners import get_mojort_builder, get_mojort_runner
 
 CHART_ENABLED = False
 

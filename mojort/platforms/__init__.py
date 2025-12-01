@@ -1,7 +1,6 @@
-from pythainer.runners import ConcreteDockerRunner
-
 from benchkit.communication.docker import DockerCommLayer
 from benchkit.platforms import Platform
+from pythainer.runners import ConcreteDockerRunner
 
 
 def get_mojort_docker_platform_from(

@@ -1,12 +1,14 @@
 import re
-from pathlib import Path
 import subprocess
-from typing import Any, Dict, List, Iterable
-from mojort.utils import language2cmdline, language2foldername, rust_add_build_path
-from benchkit.benchmark import Benchmark, RecordResult, CommandWrapper
+from pathlib import Path
+from typing import Any, Dict, Iterable, List
+
+from benchkit.benchmark import Benchmark, CommandWrapper, RecordResult
 from benchkit.platforms import Platform
 from benchkit.utils.dir import gitmainrootdir
 from benchkit.utils.types import PathType
+
+from mojort.utils import language2cmdline, language2foldername, rust_add_build_path
 
 
 class SizeBench(Benchmark):
