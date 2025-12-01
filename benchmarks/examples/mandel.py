@@ -1,5 +1,6 @@
 MAX_ITERS = 1000
 
+
 def mandelbrot_split(
     real: float,
     imag: float,
@@ -15,6 +16,7 @@ def mandelbrot_split(
         z_imag = 2.0 * z_real * z_imag + imag
         z_real = r2 - i2 + real
     return nv
+
 
 if __name__ == "__main__":
     print(mandelbrot_split(-0.5, 0.0))

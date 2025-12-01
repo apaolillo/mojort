@@ -22,10 +22,8 @@ def main() -> None:
         nb_runs=30,
         variables={
             "size": [256, 512],
-            "language": [
-                "mojo"
-            ],
-            "src_filename": ["matmul_gpu","matmul"],
+            "language": ["mojo"],
+            "src_filename": ["matmul_gpu", "matmul"],
         },
         constants={},
         debug=False,
@@ -44,33 +42,32 @@ def main() -> None:
     def test1(dataframe):
         for lan in dataframe["src_filename"].unique():
             mojodf = dataframe[dataframe.src_filename == lan]
-            avg = np.average(mojodf['runtime'])
-            nw = (dataframe[dataframe.src_filename == lan]['runtime'] / avg) - 1
-            dataframe.loc[dataframe["src_filename"] == lan,'normalized'] = nw
+            avg = np.average(mojodf["runtime"])
+            nw = (dataframe[dataframe.src_filename == lan]["runtime"] / avg) - 1
+            dataframe.loc[dataframe["src_filename"] == lan, "normalized"] = nw
         print(dataframe)
         return dataframe
 
     def test2(dataframe):
         for lan in dataframe["src_filename"].unique():
             mojodf = dataframe[dataframe.src_filename == lan]
-            avg = np.average(mojodf['runtime'])
-            nw = (dataframe[dataframe.src_filename == lan]['runtime'] - avg)
-            dataframe.loc[dataframe["src_filename"] == lan,'normalized'] = nw
+            avg = np.average(mojodf["runtime"])
+            nw = dataframe[dataframe.src_filename == lan]["runtime"] - avg
+            dataframe.loc[dataframe["src_filename"] == lan, "normalized"] = nw
         print(dataframe)
         return dataframe
-
 
     campaign.generate_graph(
         process_dataframe=test1,
         plot_name="catplot",
         title="difference between average runtime for mandelbrot program",
         kind="violin",
-        ylabel='between average en actual runtime',
+        ylabel="between average en actual runtime",
         y="normalized",
         # col="language",
         hue="src_filename",
         # split=True,
-        inner="quart"
+        inner="quart",
     )
 
     campaign.generate_graph(
@@ -78,14 +75,13 @@ def main() -> None:
         plot_name="catplot",
         title="difference between average runtime for mandelbrot program",
         kind="violin",
-        ylabel='between average en actual runtime',
+        ylabel="between average en actual runtime",
         y="normalized",
         # col="language",
         hue="src_filename",
         # split=True,
-        inner="quart"
+        inner="quart",
     )
-
 
     campaign.generate_graph(
         plot_name="barplot",

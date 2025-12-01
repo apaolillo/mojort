@@ -121,7 +121,7 @@ def main() -> None:
         benchmark=LatencyBench(platform=platform),
         nb_runs=50,
         variables={
-            "language": ["c","mojo"],
+            "language": ["c", "mojo"],
             "src_filename": ["sleep_interval"],
         },
         constants={},

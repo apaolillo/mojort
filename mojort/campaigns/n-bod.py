@@ -128,7 +128,7 @@ def main() -> None:
         benchmark=ProgramCompareBench(platform=platform),
         nb_runs=2,
         variables={
-            "language": ["mojo","cpp","cpp -O1","cpp -O3"],
+            "language": ["mojo", "cpp", "cpp -O1", "cpp -O3"],
             "src_filename": ["n-body"],
         },
         constants={},
@@ -141,9 +141,9 @@ def main() -> None:
     def test(dataframe):
         for lan in dataframe["language"].unique():
             mojodf = dataframe[dataframe.language == lan]
-            avg = np.average(mojodf['runtime'])
-            nw = (dataframe[dataframe.language == lan]['total_latency'] / avg) - 0
-            dataframe.loc[dataframe["language"] == lan,'normalized'] = nw
+            avg = np.average(mojodf["runtime"])
+            nw = (dataframe[dataframe.language == lan]["total_latency"] / avg) - 0
+            dataframe.loc[dataframe["language"] == lan, "normalized"] = nw
         return dataframe
 
     campaign.generate_graph(
@@ -151,12 +151,12 @@ def main() -> None:
         plot_name="catplot",
         title="% difference between average runtime for 3 body problem",
         kind="violin",
-        ylabel='% between average en actual runtime',
+        ylabel="% between average en actual runtime",
         y="normalized",
         # col="language",
         hue="language",
         # split=True,
-        inner="quart"
+        inner="quart",
     )
 
 

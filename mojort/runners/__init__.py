@@ -50,7 +50,15 @@ def mojo_builder(
     builder = PartialDockerBuilder()
 
     # Install Python and pip if not already present
-    builder.add_packages(packages=["python3", "python3-full", "python3-venv", "python3-pip", "libnuma-dev"])
+    builder.add_packages(
+        packages=[
+            "python3",
+            "python3-full",
+            "python3-venv",
+            "python3-pip",
+            "libnuma-dev",
+        ]
+    )
 
     mojo_config_path = "/home/${USER_NAME}/.mojort"
     venv_path = f"{mojo_config_path}/.venv"
@@ -96,7 +104,9 @@ def get_mojort_builder(
     builder |= mojo_builder(nightly=False)
     mojo_venv_path = "~/.mojort/.venv"
     pip3 = f"{mojo_venv_path}/bin/pip3"
-    builder.run(command=f'echo ". {mojo_venv_path}/bin/activate" >> /home/${{USER_NAME}}/.bash_history')
+    builder.run(
+        command=f'echo ". {mojo_venv_path}/bin/activate" >> /home/${{USER_NAME}}/.bash_history'
+    )
     builder.space()
 
     builder.workdir("/home/${USER_NAME}/workspace")
@@ -135,7 +145,7 @@ def get_mojort_runner(
         environment_variables={},
         volumes={f"{repo_dir}": f"{docker_path}"},
         devices=[],
-        other_options=['--privileged'],
+        other_options=["--privileged"],
         network="host",
         workdir=workdir,
     )

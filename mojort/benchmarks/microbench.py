@@ -65,7 +65,7 @@ class MicrobenchBench(Benchmark):
         src_filename: str = build_variables["src_filename"]
         lg_bench_dir = self._benchmark_dir / language_folder
         lg_bench_dir = rust_add_executable_path(language, src_filename, lg_bench_dir)
-        cmd = [f"./{src_filename}", f'{size}']
+        cmd = [f"./{src_filename}", f"{size}"]
 
         environment = self._preload_env(**kwargs)
         wrapped_run_command, wrapped_environment = self._wrap_command(
