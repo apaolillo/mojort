@@ -35,9 +35,9 @@ class MicrobenchBench(Benchmark):
         src_filename: str,
         **kwargs,
     ) -> None:
-        language_folder = language2foldername(language)
+        language_folder = Path(language2foldername(language))
         if language.startswith("rust"):
-            language_folder = Path(language_folder) / src_filename
+            language_folder = language_folder / src_filename
 
         lg_bench_dir = self._benchmark_dir / language_folder
         if not self.platform.comm.isdir(path=lg_bench_dir):
