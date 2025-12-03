@@ -16,25 +16,16 @@ def main() -> None:
         nb_runs=1,
         variables={
             "language": [
-                # --- C++ GCC
                 "cpp-gcc",
-                "cpp-gcc -O3",
-                # --- C++ Clang
                 "cpp-clang",
-                "cpp-clang -O3",
-                # "cpp -Ofast",
-                # --- C GCC
                 "c-gcc",
-                "c-gcc -O3",
-                # --- C Clang
                 "c-clang",
-                "c-clang -O3",
-                # --- Rust
                 "rust",
-                "rust -O3",
-                # --- Mojo
                 "mojo",
-                "mojo -O3",
+            ],
+            "opt_level": [
+                "O0",
+                "O3",
             ],
             "src_filename": ["knmp", "matmul", "mandelbrot"],
         },
@@ -53,6 +44,7 @@ def main() -> None:
         orient="h",
         x="filesize",
         y="language",
+        hue="opt_level",
     )
 
 

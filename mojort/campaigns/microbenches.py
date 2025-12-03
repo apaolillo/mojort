@@ -11,38 +11,22 @@ from mojort.runners import get_mojort_builder, get_mojort_runner
 
 nb_runs = 20
 master_thread_core = [11]
+
+# Separate language and optimization level variables
 languages = [
-    # --- C++ GCC
     "cpp-gcc",
-    "cpp-gcc -O1",
-    "cpp-gcc -O2",
-    "cpp-gcc -O3",
-    # --- C++ Clang
     "cpp-clang",
-    "cpp-clang -O1",
-    "cpp-clang -O2",
-    "cpp-clang -O3",
-    # "cpp -Ofast",
-    # --- C GCC
     "c-gcc",
-    "c-gcc -O1",
-    "c-gcc -O2",
-    "c-gcc -O3",
-    # --- C Clang
     "c-clang",
-    "c-clang -O1",
-    "c-clang -O2",
-    "c-clang -O3",
-    # --- Rust
     "rust",
-    "rust -O1",
-    "rust -O2",
-    "rust -O3",
-    # --- Mojo
     "mojo",
-    "mojo -O1",
-    "mojo -O2",
-    "mojo -O3",
+]
+
+opt_levels = [
+    "O0",
+    "O1",
+    "O2",
+    "O3",
 ]
 
 
@@ -64,6 +48,7 @@ def mandelbrot_campaign(
                 # 1024,
             ],
             "language": languages,
+            "opt_level": opt_levels,
             "src_filename": ["mandelbrot"],
             "master_thread_core": master_thread_core,
         },
@@ -93,6 +78,7 @@ def matmul_campaign(
                 # 1024,
             ],
             "language": languages,
+            "opt_level": opt_levels,
             "src_filename": ["matmul"],
             "master_thread_core": master_thread_core,
         },
@@ -122,6 +108,7 @@ def kmp_campaign(
                 # 1.0,
             ],
             "language": languages,
+            "opt_level": opt_levels,
             "src_filename": ["knmp"],
             "master_thread_core": master_thread_core,
         },
