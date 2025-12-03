@@ -14,7 +14,7 @@ class SizeBench(Benchmark):
     def __init__(
         self,
         platform: Platform,
-        command_wrappers: Iterable[CommandWrapper] = [],
+        command_wrappers: Iterable[CommandWrapper] = (),
     ) -> None:
         super().__init__(
             command_wrappers=command_wrappers,
@@ -24,8 +24,9 @@ class SizeBench(Benchmark):
             post_run_hooks=(),
         )
         self.platform = platform
-        self._src_path = gitmainrootdir() / "benchmarks"
-        self._benchmark_dir = Path("/home/user/workspace/mojort/benchmarks")
+        gmrd_host = gitmainrootdir()
+        gmrd = self.platform.comm.host_to_comm_path(host_path=gmrd_host)
+        self._src_path = gmrd / "benchmarks"
 
     @property
     def bench_src_path(self) -> Path:
@@ -41,13 +42,14 @@ class SizeBench(Benchmark):
         if language.startswith("rust"):
             language_folder = Path(language_folder) / src_filename
 
-        lg_bench_dir = self._benchmark_dir / language_folder
+        lg_bench_dir = self._src_path / language_folder
         if not self.platform.comm.isdir(path=lg_bench_dir):
             raise ValueError(
                 f"Language '{language_folder}' not found as '{lg_bench_dir}' is not a directory"
             )
         mojo_bin = "/home/user/.mojort/.venv/bin"
 
+        cmd = ""
         match language:
             # --- C++ GCC
             case "cpp -Ofast":
@@ -129,12 +131,11 @@ class SizeBench(Benchmark):
         **kwargs,
     ) -> str:
         language: str = build_variables["language"]
-        language_folder = language2foldername(language)
 
         src_filename: str = build_variables["src_filename"]
-        lg_bench_dir = language2foldername(language)
+        lg_bench_dir = self._src_path / language2foldername(language)
         if language.startswith("rust"):
-            lg_bench_dir = Path(language_folder) / src_filename
+            lg_bench_dir = Path(lg_bench_dir) / src_filename
 
         # Command to analyze the file size
         cmd = ["du", "-b", f"./{src_filename}.o"]
@@ -144,7 +145,7 @@ class SizeBench(Benchmark):
 
         # Command to get the object dump for debugging
         self.platform.comm.shell(
-            command=f"objdump -d ./{src_filename} > ./{src_filename}.dmp",
+            command=f"objdump -d ./{src_filename}.o > ./{src_filename}.dmp",
             shell=True,
             current_dir=lg_bench_dir,
         )
