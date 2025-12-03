@@ -68,13 +68,13 @@ def language2cmdline(
 
         # --- Rust
         case "rust -O3":
-            cmd = f"cargo build --profile d"
+            cmd = "cargo build --profile d"
         case "rust -O2":
-            cmd = f"cargo build --profile c"
+            cmd = "cargo build --profile c"
         case "rust -O1":
-            cmd = f"cargo build --profile b"
+            cmd = "cargo build --profile b"
         case "rust":
-            cmd = f"cargo build --profile a"
+            cmd = "cargo build --profile a"
 
         # --- Mojo
         case "mojo":

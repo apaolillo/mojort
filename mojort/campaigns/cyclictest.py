@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import pathlib
 import random
 import re
 from pathlib import Path
